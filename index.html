@@ -385,9 +385,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
     <div class="logo-bars"><span></span><span></span><span></span><span></span><span></span></div>
     <div class="logo-text">GOOD DOG <span>HQ</span></div>
   </div>
-  <div class="header-right" id="headerRight">
-    <button class="btn-login" onclick="openLoginModal()">Войти</button>
-  </div>
+  <div class="header-right" id="headerRight"></div>
 </header>
 
 <main id="mainContent"></main>
@@ -768,7 +766,6 @@ function renderShiftGroups(role, sectionName, groups) {
           <button class="del-btn" onclick="delRow(this)">×</button>
         </div>`).join('')}
     </div>
-    <button class="s-add-btn" onclick="addRow('${role === 'barista' ? 'b' : 'c'}-${group.id}')">+ Добавить позицию</button>
   `).join('');
 }
 function renderShift() {
