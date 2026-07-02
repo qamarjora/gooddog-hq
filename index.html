@@ -566,6 +566,10 @@ let activeShiftRole = 'barista';
 let shiftProductsCache = null;
 let currentShiftProductsRole = 'barista';
 
+function canEditCurrentSection() {
+  return !!(currentSection && currentSection.type === 'shift');
+}
+
 // ── DATA ──
 function getData() {
   try { const r = localStorage.getItem(DATA_KEY); return r ? JSON.parse(r) : clone(DEFAULT_DATA); }
@@ -618,15 +622,16 @@ function renderSection() {
   const s = currentSection;
   if (s.type === 'shift') { renderShift(); return; }
 
-  const addBtn = isEditor ? `<button class="btn-add" onclick="openCardModal()">+ Добавить</button>` : '';
+  const canEdit = canEditCurrentSection();
+  const addBtn = canEdit ? `<button class="btn-add" onclick="openCardModal()">+ Добавить</button>` : '';
   const cards = s.cards || [];
   const listHTML = cards.length === 0
-    ? `<div class="empty-state"><div class="empty-icon">${s.icon}</div><p>${isEditor ? 'Пока пусто. Нажми «+ Добавить».' : 'Пока ничего нет.'}</p></div>`
+    ? `<div class="empty-state"><div class="empty-icon">${s.icon}</div><p>${canEdit ? 'Пока пусто. Нажми «+ Добавить».' : 'Пока ничего нет.'}</p></div>`
     : `<div class="cards-list">${cards.map(c => `
         <div class="item-card" onclick="openCard('${c.id}')">
           <div class="item-card-left"><div class="item-dot"></div><span class="item-name">${c.name}</span></div>
           <div class="item-card-right">
-            ${isEditor ? `<button class="btn-icon" onclick="event.stopPropagation();openCardModal('${c.id}')">✏️</button>
+            ${canEdit ? `<button class="btn-icon" onclick="event.stopPropagation();openCardModal('${c.id}')">✏️</button>
             <button class="btn-icon danger" onclick="event.stopPropagation();askDelete('${c.id}')">🗑️</button>` : ''}
             <span class="arrow">›</span>
           </div>
@@ -644,7 +649,7 @@ function renderSection() {
 // ── CARD ──
 function renderCard() {
   const c = currentCard;
-  const editBtns = isEditor ? `
+  const editBtns = canEditCurrentSection() ? `
     <div class="card-actions">
       <button class="btn-edit" onclick="openCardModal('${c.id}')">✏️ Редактировать</button>
       <button class="btn-delete" onclick="askDelete('${c.id}')">🗑️ Удалить</button>
@@ -774,7 +779,7 @@ function renderShift() {
         <button class="btn-back" onclick="goHome()">← Назад</button>
         <h1 class="section-title">📦 Учёт смены</h1>
       </div>
-      ${isEditor ? `<button class="btn-shift-products" onclick="openShiftProductsModal()">⚙️ Управление продуктами</button>` : ''}
+      <button class="btn-shift-products" onclick="openShiftProductsModal()">⚙️ Управление продуктами</button>
     </div>
     <div class="shift-wrap">
       <div class="shift-tabs">
@@ -1074,14 +1079,7 @@ function doLogout() {
   showToast('Вы вышли');
 }
 function updateHeader() {
-  const el = document.getElementById('headerRight');
-  if (isEditor) {
-    el.innerHTML = `<span class="editor-badge">Редактор</span>
-      <button class="btn-settings" onclick="openSettingsModal()">⚙️</button>
-      <button class="btn-logout" onclick="doLogout()">Выйти</button>`;
-  } else {
-    el.innerHTML = `<button class="btn-login" onclick="openLoginModal()">Войти</button>`;
-  }
+  document.getElementById('headerRight').innerHTML = '';
 }
 
 // ── SETTINGS ──
