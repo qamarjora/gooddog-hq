@@ -254,6 +254,49 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 .shift-form { display: none; }
 .shift-form.active { display: block; }
 .hint { font-size: 11px; color: var(--mu); text-align: center; margin-top: 6px; }
+.btn-shift-products {
+  background: var(--g); color: var(--white); border: none; padding: 8px 12px;
+  border-radius: 8px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-shift-products:hover { background: var(--gm); }
+.product-manager-tabs {
+  display: flex; gap: 8px; margin-bottom: 16px;
+}
+.product-manager-tab {
+  flex: 1; border: 1.5px solid var(--bd); background: var(--white); color: var(--text);
+  border-radius: 10px; padding: 9px 10px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.product-manager-tab.active { background: var(--g); color: var(--white); border-color: var(--g); }
+.product-group-card {
+  background: var(--ibg); border: 1px solid var(--bd); border-radius: 12px; padding: 12px;
+  margin-bottom: 12px;
+}
+.product-group-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px;
+}
+.product-group-name {
+  flex: 1; padding: 8px 10px; border: 1px solid var(--bd); border-radius: 8px; font-size: 13px;
+  font-family: 'Manrope', sans-serif; background: var(--white); color: var(--text);
+}
+.product-item-row {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+}
+.product-item-name {
+  flex: 1; padding: 7px 9px; border: 1px solid var(--bd); border-radius: 8px; font-size: 13px;
+  font-family: 'Manrope', sans-serif; background: var(--white); color: var(--text);
+}
+.product-item-unit {
+  min-width: 76px; padding: 7px 8px; border: 1px solid var(--bd); border-radius: 8px;
+  font-size: 12px; font-family: 'Manrope', sans-serif; background: var(--white); color: var(--text);
+}
+.product-item-delete, .product-group-delete {
+  border: none; background: transparent; color: #b45309; cursor: pointer; font-size: 13px;
+  font-family: 'Manrope', sans-serif; font-weight: 700; padding: 4px 6px; border-radius: 6px;
+}
+.product-item-delete:hover, .product-group-delete:hover { background: rgba(180,83,9,0.08); }
+.product-manager-actions { margin-top: 10px; }
+.empty-state.compact { padding: 18px 10px; font-size: 12px; }
 
 /* ── MODALS ── */
 .modal-overlay {
@@ -286,7 +329,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
   background: none; border: 1.5px solid var(--bd); color: var(--text);
   padding: 9px 16px; border-radius: 8px; font-family: 'Manrope', sans-serif;
   font-size: 13px; font-weight: 600; cursor: pointer;
-}
+}ы
 .btn-save {
   background: var(--g); color: var(--white); border: none;
   padding: 9px 18px; border-radius: 8px; font-family: 'Manrope', sans-serif;
@@ -432,12 +475,78 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
   </div>
 </div>
 
+<!-- Shift Products Manager -->
+<div class="modal-overlay" id="shiftProductsModal">
+  <div class="modal wide">
+    <h2>⚙️ Управление продуктами</h2>
+    <div class="product-manager-tabs">
+      <button class="product-manager-tab active" onclick="switchShiftProductsTab('barista', this)">☕ Бариста</button>
+      <button class="product-manager-tab" onclick="switchShiftProductsTab('cook', this)">🌭 Повар</button>
+    </div>
+    <div id="shiftProductsManagerContent"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('shiftProductsModal')">Отмена</button>
+      <button class="btn-save" onclick="saveShiftProducts()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── CONSTANTS ──
 const PASS_KEY   = 'gd_pass';
 const TOKEN_KEY  = 'gd_token';
 const REPO_KEY   = 'gd_repo';
 const DATA_KEY   = 'gd_data';
+const SHIFT_PRODUCTS_KEY = 'gd_shift_products';
+
+const DEFAULT_SHIFT_PRODUCTS = {
+  barista: [
+    { id: 'dry', name: 'Сухие / сыпучие', section: 'stock', items: [
+      { id: 'barista_dry_1', name: 'Кофе', unit: 'кг' },
+      { id: 'barista_dry_2', name: 'Горячий шоколад', unit: 'кг' }
+    ] },
+    { id: 'liquid', name: 'Жидкие', section: 'stock', items: [
+      { id: 'barista_liquid_1', name: 'Молоко', unit: 'л' },
+      { id: 'barista_liquid_2', name: 'Сливки', unit: 'л' },
+      { id: 'barista_liquid_3', name: 'Сок апельсин', unit: 'л' },
+      { id: 'barista_liquid_4', name: 'Сок вишня', unit: 'л' },
+      { id: 'barista_liquid_5', name: 'Каркаде', unit: 'л' }
+    ] },
+    { id: 'cups', name: 'Стаканы', section: 'stock', items: [
+      { id: 'barista_cups_1', name: 'Стакан 0,4', unit: 'шт' },
+      { id: 'barista_cups_2', name: 'Стакан 0,3', unit: 'шт' },
+      { id: 'barista_cups_3', name: 'Стакан 0,2', unit: 'шт' },
+      { id: 'barista_cups_4', name: 'Стакан шейкер 0,4', unit: 'шт' }
+    ] },
+    { id: 'prod', name: 'Производство за смену', section: 'production', items: [
+      { id: 'barista_prod_1', name: 'Каркаде', unit: 'шт' }
+    ] }
+  ],
+  cook: [
+    { id: 'bread', name: 'Хлеб и выпечка', section: 'stock', items: [
+      { id: 'cook_bread_1', name: 'Булочки', unit: 'шт' },
+      { id: 'cook_bread_2', name: 'Френч', unit: 'шт' }
+    ] },
+    { id: 'meat', name: 'Мясо и полуфабрикаты', section: 'stock', items: [
+      { id: 'cook_meat_1', name: 'Гр. сосиски', unit: 'шт' },
+      { id: 'cook_meat_2', name: 'Кр. сосиски', unit: 'шт' },
+      { id: 'cook_meat_3', name: 'Фри', unit: 'пач' },
+      { id: 'cook_meat_4', name: 'Жареный лук', unit: 'кг' },
+      { id: 'cook_meat_5', name: 'Нагетси', unit: 'пач' }
+    ] },
+    { id: 'sauce', name: 'Соусы', section: 'stock', items: [
+      { id: 'cook_sauce_1', name: 'Кетчуп', unit: 'кг' },
+      { id: 'cook_sauce_2', name: 'Горчица', unit: 'кг' },
+      { id: 'cook_sauce_3', name: 'Барбекю', unit: 'кг' },
+      { id: 'cook_sauce_4', name: 'Сырный', unit: 'кг' }
+    ] },
+    { id: 'prod', name: 'Производство за смену', section: 'production', items: [
+      { id: 'cook_prod_1', name: 'Салат Мексиканский', unit: 'порция' },
+      { id: 'cook_prod_2', name: 'Салат Коул слоу', unit: 'порция' },
+      { id: 'cook_prod_3', name: 'Салат Морковный', unit: 'порция' }
+    ] }
+  ]
+};
 
 const DEFAULT_DATA = {
   sections: [
@@ -453,6 +562,9 @@ let currentSection = null;
 let currentCard = null;
 let pendingDeleteId = null;
 let editingCardId = null;
+let activeShiftRole = 'barista';
+let shiftProductsCache = null;
+let currentShiftProductsRole = 'barista';
 
 // ── DATA ──
 function getData() {
@@ -592,22 +704,85 @@ function inlineFmt(t) { return esc(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</stro
 function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── SHIFT (full logic from original app) ──
+function getShiftProducts() {
+  if (!shiftProductsCache) {
+    try {
+      const raw = localStorage.getItem(SHIFT_PRODUCTS_KEY);
+      if (raw) {
+        shiftProductsCache = normalizeShiftProducts(JSON.parse(raw));
+      } else {
+        shiftProductsCache = normalizeShiftProducts(DEFAULT_SHIFT_PRODUCTS);
+        localStorage.setItem(SHIFT_PRODUCTS_KEY, JSON.stringify(shiftProductsCache));
+      }
+    } catch {
+      shiftProductsCache = normalizeShiftProducts(DEFAULT_SHIFT_PRODUCTS);
+      localStorage.setItem(SHIFT_PRODUCTS_KEY, JSON.stringify(shiftProductsCache));
+    }
+  }
+  return clone(shiftProductsCache);
+}
+function setShiftProducts(data) {
+  shiftProductsCache = normalizeShiftProducts(data);
+  localStorage.setItem(SHIFT_PRODUCTS_KEY, JSON.stringify(shiftProductsCache));
+}
+function normalizeShiftProducts(data) {
+  const src = data && typeof data === 'object' ? data : {};
+  const fallback = clone(DEFAULT_SHIFT_PRODUCTS);
+  const normalizeRole = (role) => {
+    const groups = Array.isArray(src[role]) ? src[role] : fallback[role];
+    return groups.map((group, index) => ({
+      id: group && group.id ? group.id : `${role}_${index + 1}`,
+      name: group && group.name ? group.name : `Группа ${index + 1}`,
+      section: group && group.section ? group.section : 'stock',
+      items: Array.isArray(group && group.items) ? group.items.map((item, itemIndex) => ({
+        id: item && item.id ? item.id : `${role}_${index + 1}_${itemIndex + 1}`,
+        name: item && item.name ? item.name : `Позиция ${itemIndex + 1}`,
+        unit: item && item.unit ? item.unit : 'шт'
+      })) : []
+    }));
+  };
+  return {
+    barista: normalizeRole('barista'),
+    cook: normalizeRole('cook')
+  };
+}
+function renderShiftGroups(role, sectionName, groups) {
+  const sectionGroups = (groups || []).filter(g => g.section === sectionName);
+  if (!sectionGroups.length) return '';
+  return sectionGroups.map(group => `
+    <div class="group-label">${esc(group.name || 'Группа')}</div>
+    <div id="${role === 'barista' ? 'b' : 'c'}-${group.id}">
+      ${group.items.map(item => `
+        <div class="item-row">
+          <span class="sitem-name">${esc(item.name || 'Позиция')}</span>
+          <button class="edit-btn" onclick="toggleEdit(this)">✏️</button>
+          <input class="num-inp" type="number" placeholder="0" min="0">
+          <select class="unit-sel">
+            ${['шт','кг','г','л','мл','пач','порция'].map(unit => `<option value="${unit}" ${item.unit === unit ? 'selected' : ''}>${unit}</option>`).join('')}
+          </select>
+          <button class="del-btn" onclick="delRow(this)">×</button>
+        </div>`).join('')}
+    </div>
+    <button class="s-add-btn" onclick="addRow('${role === 'barista' ? 'b' : 'c'}-${group.id}')">+ Добавить позицию</button>
+  `).join('');
+}
 function renderShift() {
+  const products = getShiftProducts();
   document.getElementById('mainContent').innerHTML = `
     <div class="section-header">
       <div class="section-header-left">
         <button class="btn-back" onclick="goHome()">← Назад</button>
         <h1 class="section-title">📦 Учёт смены</h1>
       </div>
+      ${isEditor ? `<button class="btn-shift-products" onclick="openShiftProductsModal()">⚙️ Управление продуктами</button>` : ''}
     </div>
     <div class="shift-wrap">
       <div class="shift-tabs">
-        <button class="shift-tab active" onclick="switchTab('barista',this)">☕ Бариста</button>
-        <button class="shift-tab" onclick="switchTab('cook',this)">🌭 Повар</button>
+        <button class="shift-tab ${activeShiftRole === 'barista' ? 'active' : ''}" onclick="switchTab('barista',this)">☕ Бариста</button>
+        <button class="shift-tab ${activeShiftRole === 'cook' ? 'active' : ''}" onclick="switchTab('cook',this)">🌭 Повар</button>
       </div>
 
-      <!-- BARISTA -->
-      <div class="shift-form active app-body" id="form-barista">
+      <div class="shift-form ${activeShiftRole === 'barista' ? 'active' : ''} app-body" id="form-barista">
         <div class="card">
           <div class="card-title">🗓 Дата и время</div>
           <div class="dt-row"><input class="dt-inp" type="date" id="b-date"><input class="dt-inp" type="time" id="b-time"></div>
@@ -618,36 +793,11 @@ function renderShift() {
         </div>
         <div class="card">
           <div class="card-title">📦 Остатки на конец смены</div>
-          <div class="group-label">Сухие / сыпучие</div>
-          <div id="b-dry">
-            <div class="item-row"><span class="sitem-name">Кофе</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Горячий шоколад</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-          </div>
-          <button class="s-add-btn" onclick="addRow('b-dry')">+ Добавить позицию</button>
-          <div class="group-label">Жидкие</div>
-          <div id="b-liquid">
-            <div class="item-row"><span class="sitem-name">Молоко</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>л</option><option>мл</option><option>кг</option><option>г</option><option>шт</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Сливки</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>л</option><option>мл</option><option>кг</option><option>г</option><option>шт</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Сок апельсин</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>л</option><option>мл</option><option>кг</option><option>г</option><option>шт</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Сок вишня</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>л</option><option>мл</option><option>кг</option><option>г</option><option>шт</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Каркаде</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>л</option><option>мл</option><option>кг</option><option>г</option><option>шт</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-          </div>
-          <button class="s-add-btn" onclick="addRow('b-liquid')">+ Добавить позицию</button>
-          <div class="group-label">Стаканы</div>
-          <div id="b-cups">
-            <div class="item-row"><span class="sitem-name">Стакан 0,4</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Стакан 0,3</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Стакан 0,2</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Стакан шейкер 0,4</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-          </div>
-          <button class="s-add-btn" onclick="addRow('b-cups')">+ Добавить позицию</button>
+          ${renderShiftGroups('barista', 'stock', products.barista)}
         </div>
         <div class="card">
           <div class="card-title">🍵 Производство за смену</div>
-          <div id="b-prod">
-            <div class="item-row"><span class="sitem-name">Каркаде</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>л</option><option>мл</option><option>кг</option><option>г</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-          </div>
-          <button class="s-add-btn" onclick="addRow('b-prod')">+ Добавить позицию</button>
+          ${renderShiftGroups('barista', 'production', products.barista)}
         </div>
         <div class="card">
           <div class="card-title">🗑 Списания за смену</div>
@@ -666,8 +816,7 @@ function renderShift() {
         <p class="hint">✏️ нажми чтобы изменить название позиции</p>
       </div>
 
-      <!-- COOK -->
-      <div class="shift-form app-body" id="form-cook">
+      <div class="shift-form ${activeShiftRole === 'cook' ? 'active' : ''} app-body" id="form-cook">
         <div class="card">
           <div class="card-title">🗓 Дата и время</div>
           <div class="dt-row"><input class="dt-inp" type="date" id="c-date"><input class="dt-inp" type="time" id="c-time"></div>
@@ -678,38 +827,11 @@ function renderShift() {
         </div>
         <div class="card">
           <div class="card-title">📦 Остатки на конец смены</div>
-          <div class="group-label">Хлеб и выпечка</div>
-          <div id="c-bread">
-            <div class="item-row"><span class="sitem-name">Булочки</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Френч</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-          </div>
-          <button class="s-add-btn" onclick="addRow('c-bread')">+ Добавить позицию</button>
-          <div class="group-label">Мясо и полуфабрикаты</div>
-          <div id="c-meat">
-            <div class="item-row"><span class="sitem-name">Гр. сосиски</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Кр. сосиски</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Фри</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>пач</option><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Жареный лук</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Нагетси</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>пач</option><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-          </div>
-          <button class="s-add-btn" onclick="addRow('c-meat')">+ Добавить позицию</button>
-          <div class="group-label">Соусы</div>
-          <div id="c-sauce">
-            <div class="item-row"><span class="sitem-name">Кетчуп</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Горчица</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Барбекю</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Сырный</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-          </div>
-          <button class="s-add-btn" onclick="addRow('c-sauce')">+ Добавить позицию</button>
+          ${renderShiftGroups('cook', 'stock', products.cook)}
         </div>
         <div class="card">
           <div class="card-title">🥗 Производство за смену</div>
-          <div id="c-prod">
-            <div class="item-row"><span class="sitem-name">Салат Мексиканский</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>порция</option><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Салат Коул слоу</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>порция</option><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-            <div class="item-row"><span class="sitem-name">Салат Морковный</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>порция</option><option>кг</option><option>г</option><option>шт</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button></div>
-          </div>
-          <button class="s-add-btn" onclick="addRow('c-prod')">+ Добавить позицию</button>
+          ${renderShiftGroups('cook', 'production', products.cook)}
         </div>
         <div class="card">
           <div class="card-title">🛒 Закуп на завтра</div>
@@ -724,7 +846,6 @@ function renderShift() {
       </div>
     </div>`;
 
-  // Set current date/time
   const d = new Date();
   const dateStr = d.toISOString().split('T')[0];
   const timeStr = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
@@ -733,10 +854,99 @@ function renderShift() {
 }
 
 function switchTab(role, btn) {
+  activeShiftRole = role;
   document.querySelectorAll('.shift-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.shift-form').forEach(f => f.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('form-' + role).classList.add('active');
+}
+
+function openShiftProductsModal() {
+  currentShiftProductsRole = 'barista';
+  document.getElementById('shiftProductsModal').classList.add('active');
+  renderShiftProductsManager();
+}
+function switchShiftProductsTab(role, btn) {
+  currentShiftProductsRole = role;
+  document.querySelectorAll('.product-manager-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderShiftProductsManager();
+}
+function renderShiftProductsManager() {
+  const products = getShiftProducts();
+  const groups = products[currentShiftProductsRole] || [];
+  const html = groups.length
+    ? groups.map((group, groupIndex) => `
+        <div class="product-group-card">
+          <div class="product-group-header">
+            <input class="product-group-name" type="text" value="${esc(group.name || '')}" oninput="updateShiftGroupName('${currentShiftProductsRole}', ${groupIndex}, this.value)">
+            <button class="product-group-delete" onclick="removeShiftGroup('${currentShiftProductsRole}', ${groupIndex})">Удалить группу</button>
+          </div>
+          ${group.items.map((item, itemIndex) => `
+            <div class="product-item-row">
+              <input class="product-item-name" type="text" value="${esc(item.name || '')}" oninput="updateShiftProductItem('${currentShiftProductsRole}', ${groupIndex}, ${itemIndex}, this.value, null)">
+              <select class="product-item-unit" onchange="updateShiftProductItem('${currentShiftProductsRole}', ${groupIndex}, ${itemIndex}, null, this.value)">
+                ${['шт','кг','г','л','мл','пач','порция'].map(unit => `<option value="${unit}" ${item.unit === unit ? 'selected' : ''}>${unit}</option>`).join('')}
+              </select>
+              <button class="product-item-delete" onclick="removeShiftProductItem('${currentShiftProductsRole}', ${groupIndex}, ${itemIndex})">Удалить</button>
+            </div>
+          `).join('')}
+          <button class="s-add-btn" onclick="addShiftProductItem('${currentShiftProductsRole}', ${groupIndex})">+ Добавить позицию</button>
+        </div>
+      `).join('')
+    : '<div class="empty-state compact">Пока нет групп</div>';
+  document.getElementById('shiftProductsManagerContent').innerHTML = `
+    <div class="product-manager-root">${html}</div>
+    <div class="product-manager-actions">
+      <button class="s-add-btn" onclick="addShiftGroup('${currentShiftProductsRole}')">+ Добавить группу</button>
+    </div>`;
+}
+function updateShiftGroupName(role, groupIndex, value) {
+  const products = getShiftProducts();
+  if (products[role] && products[role][groupIndex]) products[role][groupIndex].name = value;
+  setShiftProducts(products);
+}
+function updateShiftProductItem(role, groupIndex, itemIndex, name, unit) {
+  const products = getShiftProducts();
+  const group = products[role] && products[role][groupIndex];
+  const item = group && group.items && group.items[itemIndex];
+  if (!item) return;
+  if (name !== null && typeof name !== 'undefined') item.name = name;
+  if (unit !== null && typeof unit !== 'undefined') item.unit = unit;
+  setShiftProducts(products);
+}
+function addShiftProductItem(role, groupIndex) {
+  const products = getShiftProducts();
+  if (!products[role] || !products[role][groupIndex]) return;
+  products[role][groupIndex].items.push({ id: `${role}_${groupIndex + 1}_${Date.now()}`, name: 'Новая позиция', unit: 'шт' });
+  setShiftProducts(products);
+  renderShiftProductsManager();
+}
+function removeShiftProductItem(role, groupIndex, itemIndex) {
+  const products = getShiftProducts();
+  if (!products[role] || !products[role][groupIndex]) return;
+  products[role][groupIndex].items.splice(itemIndex, 1);
+  setShiftProducts(products);
+  renderShiftProductsManager();
+}
+function addShiftGroup(role) {
+  const products = getShiftProducts();
+  products[role].push({ id: `${role}_group_${Date.now()}`, name: 'Новая группа', section: 'stock', items: [] });
+  setShiftProducts(products);
+  renderShiftProductsManager();
+}
+function removeShiftGroup(role, groupIndex) {
+  const products = getShiftProducts();
+  if (!products[role] || !products[role][groupIndex]) return;
+  products[role].splice(groupIndex, 1);
+  setShiftProducts(products);
+  renderShiftProductsManager();
+}
+function saveShiftProducts() {
+  setShiftProducts(getShiftProducts());
+  closeModal('shiftProductsModal');
+  renderShift();
+  showToast('Продукты обновлены');
 }
 
 function toggleEdit(btn) {
