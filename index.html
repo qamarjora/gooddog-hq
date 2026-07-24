@@ -22,7 +22,7 @@
 html, body { height: 100%; overflow-x: hidden; }
 body { font-family: 'Manrope', sans-serif; background: var(--white); color: var(--text); -webkit-font-smoothing: antialiased; }
 
-/* ── HEADER ── */
+/* HEADER */
 header {
   background: var(--g); padding: 0 20px; height: 56px;
   display: flex; align-items: center; justify-content: space-between;
@@ -38,7 +38,7 @@ header {
 .logo-bars span:nth-child(5) { height: 12px; }
 .logo-text { color: var(--white); font-size: 14px; font-weight: 800; letter-spacing: 0.05em; }
 .logo-text span { color: var(--y); }
-.header-right { display: flex; align-items: center; gap: 10px; }
+.header-right { display: flex; align-items: center; gap: 8px; }
 .btn-login {
   background: transparent; border: 1.5px solid rgba(255,255,255,0.3);
   color: var(--white); padding: 6px 14px; border-radius: 8px;
@@ -56,14 +56,14 @@ header {
 }
 .btn-settings {
   background: transparent; border: none; color: rgba(255,255,255,0.6);
-  font-size: 18px; cursor: pointer; padding: 4px 6px; line-height: 1;
+  font-size: 17px; cursor: pointer; padding: 4px 6px; line-height: 1;
 }
 .btn-settings:hover { color: var(--y); }
 
-/* ── MAIN ── */
+/* MAIN */
 main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 
-/* ── HOME ── */
+/* HOME */
 .home-greeting { margin-bottom: 32px; }
 .home-greeting h1 { font-size: 24px; font-weight: 800; color: var(--g); margin-bottom: 4px; }
 .home-greeting p { color: var(--mu); font-size: 14px; }
@@ -81,9 +81,10 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 .section-card h2 { font-size: 15px; font-weight: 700; color: var(--g); margin-bottom: 5px; }
 .section-card p { font-size: 12px; color: var(--mu); line-height: 1.5; }
 
-/* ── SECTION HEADER ── */
+/* SECTION HEADER */
 .section-header {
   display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+  flex-wrap: wrap; gap: 10px;
 }
 .section-header-left { display: flex; align-items: center; gap: 12px; }
 .btn-back {
@@ -100,7 +101,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 }
 .btn-add:hover { background: var(--gm); }
 
-/* ── CARDS LIST ── */
+/* CARDS LIST */
 .cards-list { display: flex; flex-direction: column; gap: 8px; }
 .item-card {
   background: var(--white); border: 1.5px solid var(--bd); border-radius: var(--radius);
@@ -120,7 +121,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 .btn-icon.danger:hover { background: #fee2e2; }
 .arrow { color: var(--mu); font-size: 18px; }
 
-/* ── CARD DETAIL ── */
+/* CARD DETAIL */
 .card-detail { max-width: 700px; }
 .card-detail-header {
   display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
@@ -155,12 +156,13 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 .card-content tr:last-child td { border-bottom: none; }
 .card-content tr:nth-child(even) td { background: var(--ibg); }
 
-/* ── EMPTY STATE ── */
+/* EMPTY STATE */
 .empty-state { text-align: center; padding: 56px 24px; color: var(--mu); }
 .empty-state .empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.35; }
 .empty-state p { font-size: 14px; }
+.empty-state.compact { padding: 18px 10px; font-size: 12px; }
 
-/* ── SHIFT (from original app) ── */
+/* SHIFT */
 .shift-wrap { max-width: 500px; margin: 0 auto; }
 .app-body { display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; }
 .card {
@@ -260,17 +262,93 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
   cursor: pointer; transition: background 0.2s;
 }
 .btn-shift-products:hover { background: var(--gm); }
-.product-manager-tabs {
-  display: flex; gap: 8px; margin-bottom: 16px;
+
+/* CHECKLIST BUTTON */
+.btn-checklist {
+  width: 100%; padding: 14px; background: var(--y); color: var(--g);
+  border: none; border-radius: 14px; font-size: 15px; font-weight: 700;
+  font-family: 'Manrope', sans-serif; display: flex; align-items: center;
+  justify-content: center; gap: 8px; cursor: pointer; margin-top: 4px;
+  transition: filter 0.2s;
 }
+.btn-checklist:hover { filter: brightness(0.95); }
+.btn-checklist:active { transform: scale(0.98); }
+.cl-count {
+  background: var(--g); color: var(--y); border-radius: 20px;
+  padding: 1px 9px; font-size: 12px; font-weight: 800;
+}
+
+/* CHECKLIST MODAL */
+.cl-hint {
+  font-size: 12px; color: var(--mu); line-height: 1.5;
+  background: var(--ibg); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;
+}
+.cl-group-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--g); padding: 14px 0 6px; border-bottom: 1px solid var(--bd); margin-bottom: 4px;
+}
+.cl-row {
+  display: flex; align-items: center; gap: 10px; padding: 8px 4px;
+  border-bottom: 0.5px solid var(--dv); cursor: pointer;
+}
+.cl-row:last-child { border-bottom: none; }
+.cl-row.checked { background: rgba(255,204,0,0.12); border-radius: 8px; }
+.cl-cb {
+  width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--g); cursor: pointer;
+}
+.cl-name { flex: 1; font-size: 13px; font-weight: 500; color: var(--text); min-width: 0; }
+.cl-min {
+  font-size: 11px; font-weight: 700; color: var(--g);
+  background: rgba(9,48,35,0.07); border-radius: 6px; padding: 3px 8px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.cl-scroll { max-height: 52vh; overflow-y: auto; padding-right: 4px; }
+.cl-toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.btn-cl-edit {
+  background: none; border: 1.5px solid var(--bd); color: var(--text);
+  padding: 7px 12px; border-radius: 8px; font-family: 'Manrope', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.btn-cl-edit:hover { border-color: var(--g); color: var(--g); }
+
+/* CHECKLIST EDITOR */
+.cle-group {
+  background: var(--ibg); border: 1px solid var(--bd); border-radius: 12px;
+  padding: 12px; margin-bottom: 12px;
+}
+.cle-group-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cle-group-name {
+  flex: 1; padding: 8px 10px; border: 1px solid var(--bd); border-radius: 8px;
+  font-size: 13px; font-family: 'Manrope', sans-serif; font-weight: 700;
+  background: var(--white); color: var(--text);
+}
+.cle-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.cle-name {
+  flex: 1; padding: 7px 9px; border: 1px solid var(--bd); border-radius: 8px;
+  font-size: 13px; font-family: 'Manrope', sans-serif; background: var(--white); color: var(--text);
+}
+.cle-min {
+  width: 110px; padding: 7px 9px; border: 1px solid var(--bd); border-radius: 8px;
+  font-size: 12px; font-family: 'Manrope', sans-serif; background: var(--white); color: var(--text);
+}
+.cle-del, .cle-group-del {
+  border: none; background: transparent; color: #b45309; cursor: pointer;
+  font-size: 12px; font-family: 'Manrope', sans-serif; font-weight: 700;
+  padding: 4px 6px; border-radius: 6px; flex-shrink: 0;
+}
+.cle-del:hover, .cle-group-del:hover { background: rgba(180,83,9,0.08); }
+
+/* PRODUCT MANAGER */
+.product-manager-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
 .product-manager-tab {
   flex: 1; border: 1.5px solid var(--bd); background: var(--white); color: var(--text);
-  border-radius: 10px; padding: 9px 10px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;
+  border-radius: 10px; padding: 9px 10px; font-family: 'Manrope', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer;
 }
 .product-manager-tab.active { background: var(--g); color: var(--white); border-color: var(--g); }
 .product-group-card {
-  background: var(--ibg); border: 1px solid var(--bd); border-radius: 12px; padding: 12px;
-  margin-bottom: 12px;
+  background: var(--ibg); border: 1px solid var(--bd); border-radius: 12px;
+  padding: 12px; margin-bottom: 12px;
 }
 .product-group-header {
   display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px;
@@ -279,9 +357,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
   flex: 1; padding: 8px 10px; border: 1px solid var(--bd); border-radius: 8px; font-size: 13px;
   font-family: 'Manrope', sans-serif; background: var(--white); color: var(--text);
 }
-.product-item-row {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
-}
+.product-item-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 .product-item-name {
   flex: 1; padding: 7px 9px; border: 1px solid var(--bd); border-radius: 8px; font-size: 13px;
   font-family: 'Manrope', sans-serif; background: var(--white); color: var(--text);
@@ -296,9 +372,8 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 }
 .product-item-delete:hover, .product-group-delete:hover { background: rgba(180,83,9,0.08); }
 .product-manager-actions { margin-top: 10px; }
-.empty-state.compact { padding: 18px 10px; font-size: 12px; }
 
-/* ── MODALS ── */
+/* MODALS */
 .modal-overlay {
   display: none; position: fixed; inset: 0; background: rgba(9,48,35,0.4);
   z-index: 200; align-items: center; justify-content: center; padding: 20px;
@@ -324,12 +399,13 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 .form-group input:focus, .form-group textarea:focus { border-color: var(--g); }
 .form-group textarea { min-height: 200px; resize: vertical; line-height: 1.6; }
 .form-hint { font-size: 11px; color: var(--mu); margin-top: 4px; line-height: 1.4; }
-.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
 .btn-cancel {
   background: none; border: 1.5px solid var(--bd); color: var(--text);
   padding: 9px 16px; border-radius: 8px; font-family: 'Manrope', sans-serif;
   font-size: 13px; font-weight: 600; cursor: pointer;
-}ы
+}
+.btn-cancel:hover { border-color: var(--mu); }
 .btn-save {
   background: var(--g); color: var(--white); border: none;
   padding: 9px 18px; border-radius: 8px; font-family: 'Manrope', sans-serif;
@@ -339,7 +415,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 .settings-section { background: var(--ibg); border-radius: 10px; padding: 14px; margin-bottom: 14px; }
 .settings-section h3 { font-size: 11px; font-weight: 700; color: var(--mu); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
 
-/* ── GITHUB SAVE BAR ── */
+/* GITHUB SAVE BAR */
 .save-github-bar { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 90; }
 .save-github-bar.visible { display: block; }
 .btn-github-save {
@@ -351,7 +427,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 .btn-github-save:hover { background: var(--gm); transform: translateY(-1px); }
 .btn-github-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-/* ── TOAST ── */
+/* TOAST */
 .toast {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px);
   background: var(--g); color: var(--white); padding: 11px 18px; border-radius: 10px;
@@ -364,21 +440,11 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
   main { padding: 20px 14px 80px; }
   .sections-grid { grid-template-columns: 1fr; }
   .modal { padding: 20px 16px; }
+  .cle-min { width: 88px; }
 }
 </style>
 </head>
 <body>
-
-<svg style="display:none">
-  <symbol id="logo" viewBox="0 0 280 170">
-    <rect x="10" y="5" width="32" height="88" rx="4" fill="#ffcc00"/>
-    <rect x="56" y="5" width="32" height="88" rx="4" fill="#ffcc00"/>
-    <rect x="102" y="5" width="32" height="88" rx="4" fill="#ffcc00"/>
-    <rect x="148" y="5" width="32" height="88" rx="4" fill="#ffcc00"/>
-    <rect x="194" y="5" width="32" height="88" rx="4" fill="#ffcc00"/>
-    <text x="118" y="148" text-anchor="middle" font-family="Arial Black,sans-serif" font-weight="900" font-size="40" fill="#ffffff" letter-spacing="1">GOOD DOG</text>
-  </symbol>
-</svg>
 
 <header>
   <div class="logo" onclick="goHome()">
@@ -391,7 +457,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 <main id="mainContent"></main>
 
 <div class="save-github-bar" id="saveBar">
-  <button class="btn-github-save" id="btnGithubSave" onclick="saveToGithub()">☁️ Сохранить в GitHub</button>
+  <button class="btn-github-save" id="btnGithubSave" onclick="saveToGithub()">⬆️ Опубликовать для сотрудников</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -414,7 +480,7 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 <!-- Settings -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
-    <h2>⚙️ Настройки</h2>
+    <h2>Настройки</h2>
     <div class="settings-section">
       <h3>GitHub</h3>
       <div class="form-group">
@@ -476,15 +542,42 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 <!-- Shift Products Manager -->
 <div class="modal-overlay" id="shiftProductsModal">
   <div class="modal wide">
-    <h2>⚙️ Управление продуктами</h2>
+    <h2>Управление продуктами (остатки)</h2>
     <div class="product-manager-tabs">
-      <button class="product-manager-tab active" onclick="switchShiftProductsTab('barista', this)">☕ Бариста</button>
-      <button class="product-manager-tab" onclick="switchShiftProductsTab('cook', this)">🌭 Повар</button>
+      <button class="product-manager-tab active" onclick="switchShiftProductsTab('barista', this)">Бариста</button>
+      <button class="product-manager-tab" onclick="switchShiftProductsTab('cook', this)">Повар</button>
     </div>
     <div id="shiftProductsManagerContent"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('shiftProductsModal')">Отмена</button>
       <button class="btn-save" onclick="saveShiftProducts()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Checklist Modal -->
+<div class="modal-overlay" id="checklistModal">
+  <div class="modal wide">
+    <h2 id="checklistTitle">Чек-лист закупа</h2>
+    <p class="cl-hint">Проверь остаток каждой позиции. Если осталось <b>столько же или меньше</b>, чем указано в мин. остатке — поставь галочку. Отмеченные позиции попадут в закуп при отправке в WhatsApp.</p>
+    <div class="cl-toolbar" id="clToolbar"></div>
+    <div class="cl-scroll" id="checklistContent"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="resetChecklist()">Снять все галочки</button>
+      <button class="btn-save" onclick="closeChecklist()">Готово</button>
+    </div>
+  </div>
+</div>
+
+<!-- Checklist Editor Modal -->
+<div class="modal-overlay" id="checklistEditModal">
+  <div class="modal wide">
+    <h2 id="checklistEditTitle">Редактирование чек-листа</h2>
+    <p class="cl-hint">Мин. остаток пишется текстом так, как понятно сотруднику: «1 кг», «1/3 л», «50 шт», «Каждый день».</p>
+    <div class="cl-scroll" id="checklistEditContent"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('checklistEditModal')">Закрыть</button>
+      <button class="btn-save" onclick="saveChecklistEdits()">Сохранить</button>
     </div>
   </div>
 </div>
@@ -530,7 +623,7 @@ const DEFAULT_SHIFT_PRODUCTS = {
       { id: 'cook_meat_2', name: 'Кр. сосиски', unit: 'шт' },
       { id: 'cook_meat_3', name: 'Фри', unit: 'пач' },
       { id: 'cook_meat_4', name: 'Жареный лук', unit: 'кг' },
-      { id: 'cook_meat_5', name: 'Нагетси', unit: 'пач' }
+      { id: 'cook_meat_5', name: 'Наггетсы', unit: 'пач' }
     ] },
     { id: 'sauce', name: 'Соусы', section: 'stock', items: [
       { id: 'cook_sauce_1', name: 'Кетчуп', unit: 'кг' },
@@ -546,13 +639,171 @@ const DEFAULT_SHIFT_PRODUCTS = {
   ]
 };
 
+// ── ЧЕК-ЛИСТ ЗАКУПА ──
+const DEFAULT_CHECKLIST = {
+  cook: [
+    { id: 'ck_base', name: 'Основное', items: [
+      { id: 'ck101', name: 'Сосиски говяжьи', min: 'Каждый день' },
+      { id: 'ck102', name: 'Сосиски куриные', min: '2 пачки' },
+      { id: 'ck103', name: 'Булочки', min: 'Каждый день' },
+      { id: 'ck104', name: 'Булочки для френч', min: '40 шт' }
+    ] },
+    { id: 'ck_sauce', name: 'Соусы', items: [
+      { id: 'ck201', name: 'Кетчуп', min: '2 кг' },
+      { id: 'ck202', name: 'Барбекю', min: '1 кг' },
+      { id: 'ck203', name: 'Сырный', min: '1 кг' },
+      { id: 'ck204', name: 'Сладкая горчица', min: '2 кг' },
+      { id: 'ck205', name: 'Табаско', min: '2 шт' }
+    ] },
+    { id: 'ck_add', name: 'Добавки', items: [
+      { id: 'ck301', name: 'Жареный лук', min: '0,5 кг' },
+      { id: 'ck302', name: 'Чипсы', min: '1 пачка' },
+      { id: 'ck303', name: 'Сыр ломтики Чеддер', min: '1/3 пачки' },
+      { id: 'ck304', name: 'Халапеньо', min: '1/3 банки' },
+      { id: 'ck305', name: 'Огурцы маринованные', min: '1 банка' }
+    ] },
+    { id: 'ck_snack', name: 'Закуски', items: [
+      { id: 'ck401', name: 'Фри', min: '3 пачки' },
+      { id: 'ck402', name: 'Наггетсы', min: '1 пачка' }
+    ] },
+    { id: 'ck_other', name: 'Прочее', items: [
+      { id: 'ck501', name: 'Масло для фри', min: '1/3 канистры' },
+      { id: 'ck502', name: 'Соль Экстра', min: '1/3 пачки' },
+      { id: 'ck503', name: 'Майонез', min: '1/3 пачки' },
+      { id: 'ck504', name: 'Сметана', min: '1/3 пачки' },
+      { id: 'ck505', name: 'Чим чим', min: '1 шт' }
+    ] },
+    { id: 'ck_veg', name: 'Овощи', items: [
+      { id: 'ck601', name: 'Помидор', min: '1 кг' },
+      { id: 'ck602', name: 'Белый лук', min: '0,5 кг' },
+      { id: 'ck603', name: 'Красный лук', min: '0,5 кг' },
+      { id: 'ck604', name: 'Красная капуста', min: '1 кг' },
+      { id: 'ck605', name: 'Белая капуста', min: '1 кг' },
+      { id: 'ck606', name: 'Огурцы', min: '2 шт' },
+      { id: 'ck607', name: 'Морковь', min: '0,5 кг' },
+      { id: 'ck608', name: 'Укроп', min: '1 пучок' },
+      { id: 'ck609', name: 'Кинза', min: '1 пучок' }
+    ] },
+    { id: 'ck_pack', name: 'Одноразовая посуда', items: [
+      { id: 'ck701', name: 'Бокс с собой', min: '50 шт' },
+      { id: 'ck702', name: 'Обёртка', min: '1/3 пачки' },
+      { id: 'ck703', name: 'Пакет для френч', min: '50 шт' },
+      { id: 'ck704', name: 'Пакет для фри', min: '50 шт' },
+      { id: 'ck705', name: 'Соусница', min: '50 шт' },
+      { id: 'ck706', name: 'Крафт пакеты', min: '50 шт' },
+      { id: 'ck707', name: 'Маячка', min: '1 рулон' },
+      { id: 'ck708', name: 'Перчатки виниловые', min: '1 пачка' },
+      { id: 'ck709', name: 'Фольга', min: '1 рулон' },
+      { id: 'ck710', name: 'Влажные салфетки', min: '1/3 коробки' },
+      { id: 'ck711', name: 'Обычные салфетки', min: '10 пачек' }
+    ] }
+  ],
+  barista: [
+    { id: 'bk_base', name: 'Основное', items: [
+      { id: 'bk101', name: 'Кофе', min: '1 кг' },
+      { id: 'bk102', name: 'Молоко', min: '10 л' },
+      { id: 'bk103', name: 'Горячий шоколад', min: '1/3 ёмкости' },
+      { id: 'bk104', name: 'Сливки', min: '500 мл' },
+      { id: 'bk105', name: 'Чай чёрный', min: '1/3 пачки' },
+      { id: 'bk106', name: 'Чай зелёный', min: '1/3 пачки' },
+      { id: 'bk107', name: 'Каркаде листовой', min: '500 г' },
+      { id: 'bk108', name: 'Мороженое', min: '1 тара' },
+      { id: 'bk109', name: 'Лёд', min: '1 пачка' },
+      { id: 'bk110', name: 'Сахар килограммовый', min: '1/3 кг' },
+      { id: 'bk110', name: 'Сахар килограммовый', min: '1/3 кг' }
+    ] },
+    { id: 'bk_syrup', name: 'Сиропы, пюре, топпинги', items: [
+      { id: 'bk201', name: 'Пинч Карамель', min: '1/3 л' },
+      { id: 'bk202', name: 'Пинч Солёная карамель', min: '1/3 л' },
+      { id: 'bk203', name: 'Пинч Ваниль', min: '1/3 л' },
+      { id: 'bk204', name: 'Пинч Лесной орех', min: '1/3 л' },
+      { id: 'bk205', name: 'Пинч Шоколад', min: '1/3 л' },
+      { id: 'bk206', name: 'Пинч Попкорн', min: '1/3 л' },
+      { id: 'bk207', name: 'Пинч Кокос', min: '1/3 л' },
+      { id: 'bk208', name: 'Пинч Малина', min: '1/3 л' },
+      { id: 'bk209', name: 'Пинч Смородина', min: '1/3 л' },
+      { id: 'bk210', name: 'Пинч Банан', min: '1/3 л' },
+      { id: 'bk211', name: 'Пинч Гранат', min: '1/3 л' },
+      { id: 'bk212', name: 'Пинч Манго', min: '1/3 л' },
+      { id: 'bk213', name: 'Пинч Зелёное яблоко', min: '1/3 л' },
+      { id: 'bk214', name: 'Пинч Мохито', min: '1/3 л' },
+      { id: 'bk215', name: 'Пинч Сок лимона', min: '1/3 л' },
+      { id: 'bk216', name: 'Пюре Клюква', min: '1/3 л' },
+      { id: 'bk217', name: 'Пюре Облепиха', min: '1/3 л' },
+      { id: 'bk218', name: 'Пюре Маракуйя с косточкой', min: '1/3 л' },
+      { id: 'bk219', name: 'Пюре Киви', min: '1/3 л' },
+      { id: 'bk220', name: 'Пюре Вишня', min: '1/3 л' },
+      { id: 'bk221', name: 'Имбирь конфитюр', min: '1/3 л' },
+      { id: 'bk222', name: 'Шоколад топпинг', min: '1/3 л' },
+      { id: 'bk223', name: 'Клубника топпинг', min: '1/3 л' }
+    ] },
+    { id: 'bk_fruit', name: 'Фрукты и заморозка', items: [
+      { id: 'bk301', name: 'Лимон', min: '1 шт' },
+      { id: 'bk302', name: 'Банан', min: '0,5 пучка' },
+      { id: 'bk303', name: 'Апельсин', min: '1 шт' },
+      { id: 'bk304', name: 'Малина замороженная', min: '1/3 пачки' }
+    ] },
+    { id: 'bk_drink', name: 'Напитки', items: [
+      { id: 'bk401', name: 'Апельсин Piko 1л', min: '1 л' },
+      { id: 'bk402', name: 'Вишнёвый сок', min: '1 л' },
+      { id: 'bk403', name: 'Тоник ЖБ', min: '2 шт' },
+      { id: 'bk404', name: 'Вода 0,5', min: '1 упаковка' },
+      { id: 'bk405', name: 'Кола', min: '1 упаковка' },
+      { id: 'bk406', name: 'Фанта', min: '1 упаковка' },
+      { id: 'bk407', name: 'Fuse tea', min: '2 упаковки' },
+      { id: 'bk408', name: 'Детский сок', min: '1 упаковка' },
+      { id: 'bk409', name: 'Сарыагаш', min: '2 шт' }
+    ] },
+    { id: 'bk_pack', name: 'Одноразовая посуда', items: [
+      { id: 'bk501', name: 'Стакан 0,3', min: '50 шт' },
+      { id: 'bk502', name: 'Стакан 0,4', min: '50 шт' },
+      { id: 'bk503', name: 'Стакан 0,2', min: '50 шт' },
+      { id: 'bk504', name: 'Стакан 0,1 для эспрессо', min: '25 шт' },
+      { id: 'bk505', name: 'Одноразовый стакан 0,2', min: '25 шт' },
+      { id: 'bk506', name: 'Шейкер 400 мл', min: '50 шт' },
+      { id: 'bk507', name: 'Крышки для холодного', min: '50 шт' },
+      { id: 'bk508', name: 'Крышки для горячего', min: '50 шт' },
+      { id: 'bk509', name: 'Бутылка 300 мл', min: '20 шт' },
+      { id: 'bk510', name: 'Палочки', min: '1/3 пачки' },
+      { id: 'bk511', name: 'Подстаканник двойной', min: '20 шт' },
+      { id: 'bk512', name: 'Подстаканник четверной', min: '20 шт' },
+      { id: 'bk513', name: 'Трубочки толстые', min: '1/3 пачки' },
+      { id: 'bk514', name: 'Кап холдер', min: '1 пачка' },
+      { id: 'bk515', name: 'Сахар в стиках', min: '1/3 коробки' },
+      { id: 'bk516', name: 'Влажные салфетки', min: '1/3 коробки' },
+      { id: 'bk517', name: 'Обычные салфетки', min: '10 пачек' }
+    ] },
+    { id: 'bk_house', name: 'Хоз товары', items: [
+      { id: 'bk601', name: 'Гарбич 160 л', min: '1 рулон' },
+      { id: 'bk602', name: 'Тряпка для швабры', min: '1 шт' },
+      { id: 'bk603', name: 'Микрофибра', min: '1 пачка' },
+      { id: 'bk604', name: 'Микрофибра для стекла', min: '1 шт' },
+      { id: 'bk605', name: 'Губки', min: '1 пачка' },
+      { id: 'bk606', name: 'Азелит', min: '1/3 л' },
+      { id: 'bk607', name: 'Фэйри', min: '1/3 л' },
+      { id: 'bk608', name: 'Мистер Мускул', min: '1/3 л' },
+      { id: 'bk609', name: 'Средство для стёкол', min: '1/3 л' },
+      { id: 'bk610', name: 'Порошок для кофемашины', min: '1/3 упаковки' },
+      { id: 'bk611', name: 'Антисептик 1 л', min: '1/3 л' }
+    ] },
+    { id: 'bk_office', name: 'Канц товары', items: [
+      { id: 'bk701', name: 'Чековая бумага 80 мм', min: '1 пачка' },
+      { id: 'bk702', name: 'Маркеры', min: '1 шт' },
+      { id: 'bk703', name: 'Степлер / скобы', min: '1 пачка' },
+      { id: 'bk704', name: 'Ручки', min: '1 шт' }
+    ] }
+  ]
+};
+
 const DEFAULT_DATA = {
   sections: [
     { id:'shift',     title:'Учёт смены',  icon:'📦', desc:'Остатки, производство, закуп', type:'shift',  cards:[] },
     { id:'tech',      title:'Тех карты',   icon:'📋', desc:'Все блюда и напитки',           type:'cards', cards:[] },
     { id:'standards', title:'Стандарты',   icon:'✅', desc:'Обязанности и роли',            type:'cards', cards:[] },
     { id:'regs',      title:'Регламенты',  icon:'📌', desc:'Открытие, закрытие, уборка',    type:'cards', cards:[] }
-  ]
+  ],
+  checklist: null,
+  shiftProducts: null
 };
 
 let isEditor = false;
@@ -563,10 +814,9 @@ let editingCardId = null;
 let activeShiftRole = 'barista';
 let shiftProductsCache = null;
 let currentShiftProductsRole = 'barista';
-
-function canEditCurrentSection() {
-  return !!(currentSection && currentSection.type === 'shift');
-}
+let checklistRole = 'barista';
+let checkedPurchase = { barista: {}, cook: {} };
+let checklistDraft = null;
 
 // ── DATA ──
 function getData() {
@@ -575,11 +825,24 @@ function getData() {
 }
 function setData(data) {
   localStorage.setItem(DATA_KEY, JSON.stringify(data));
-  document.getElementById('saveBar').classList.add('visible');
+  if (isEditor) document.getElementById('saveBar').classList.add('visible');
 }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function getSetting(k, d='') { return localStorage.getItem(k) || d; }
 function getPassword() { return getSetting(PASS_KEY, 'Good2020'); }
+function canEditCurrentSection() { return isEditor; }
+
+// ── CHECKLIST DATA ──
+function getChecklist() {
+  const data = getData();
+  if (data.checklist && data.checklist.barista && data.checklist.cook) return clone(data.checklist);
+  return clone(DEFAULT_CHECKLIST);
+}
+function setChecklist(cl) {
+  const data = getData();
+  data.checklist = cl;
+  setData(data);
+}
 
 // ── NAV ──
 function goHome() { currentSection = null; currentCard = null; renderHome(); }
@@ -627,7 +890,7 @@ function renderSection() {
     ? `<div class="empty-state"><div class="empty-icon">${s.icon}</div><p>${canEdit ? 'Пока пусто. Нажми «+ Добавить».' : 'Пока ничего нет.'}</p></div>`
     : `<div class="cards-list">${cards.map(c => `
         <div class="item-card" onclick="openCard('${c.id}')">
-          <div class="item-card-left"><div class="item-dot"></div><span class="item-name">${c.name}</span></div>
+          <div class="item-card-left"><div class="item-dot"></div><span class="item-name">${esc(c.name)}</span></div>
           <div class="item-card-right">
             ${canEdit ? `<button class="btn-icon" onclick="event.stopPropagation();openCardModal('${c.id}')">✏️</button>
             <button class="btn-icon danger" onclick="event.stopPropagation();askDelete('${c.id}')">🗑️</button>` : ''}
@@ -658,7 +921,7 @@ function renderCard() {
       <div class="card-detail-header">
         <div style="display:flex;align-items:center;gap:12px;">
           <button class="btn-back" onclick="renderSection()">← Назад</button>
-          <h1 class="card-detail-title">${c.name}</h1>
+          <h1 class="card-detail-title">${esc(c.name)}</h1>
         </div>${editBtns}
       </div>
       <div class="card-content">${parseContent(c.content)}</div>
@@ -704,29 +967,31 @@ function renderTable(rows) {
   return html + '</table>';
 }
 function inlineFmt(t) { return esc(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>'); }
-function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(t) { return String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ── SHIFT (full logic from original app) ──
+// ── SHIFT PRODUCTS ──
 function getShiftProducts() {
   if (!shiftProductsCache) {
-    try {
-      const raw = localStorage.getItem(SHIFT_PRODUCTS_KEY);
-      if (raw) {
-        shiftProductsCache = normalizeShiftProducts(JSON.parse(raw));
-      } else {
+    const data = getData();
+    if (data.shiftProducts && data.shiftProducts.barista && data.shiftProducts.cook) {
+      shiftProductsCache = normalizeShiftProducts(data.shiftProducts);
+    } else {
+      try {
+        const raw = localStorage.getItem(SHIFT_PRODUCTS_KEY);
+        shiftProductsCache = normalizeShiftProducts(raw ? JSON.parse(raw) : DEFAULT_SHIFT_PRODUCTS);
+      } catch {
         shiftProductsCache = normalizeShiftProducts(DEFAULT_SHIFT_PRODUCTS);
-        localStorage.setItem(SHIFT_PRODUCTS_KEY, JSON.stringify(shiftProductsCache));
       }
-    } catch {
-      shiftProductsCache = normalizeShiftProducts(DEFAULT_SHIFT_PRODUCTS);
-      localStorage.setItem(SHIFT_PRODUCTS_KEY, JSON.stringify(shiftProductsCache));
     }
   }
   return clone(shiftProductsCache);
 }
-function setShiftProducts(data) {
-  shiftProductsCache = normalizeShiftProducts(data);
+function setShiftProducts(products) {
+  shiftProductsCache = normalizeShiftProducts(products);
   localStorage.setItem(SHIFT_PRODUCTS_KEY, JSON.stringify(shiftProductsCache));
+  const data = getData();
+  data.shiftProducts = shiftProductsCache;
+  setData(data);
 }
 function normalizeShiftProducts(data) {
   const src = data && typeof data === 'object' ? data : {};
@@ -744,10 +1009,7 @@ function normalizeShiftProducts(data) {
       })) : []
     }));
   };
-  return {
-    barista: normalizeRole('barista'),
-    cook: normalizeRole('cook')
-  };
+  return { barista: normalizeRole('barista'), cook: normalizeRole('cook') };
 }
 function renderShiftGroups(role, sectionName, groups) {
   const sectionGroups = (groups || []).filter(g => g.section === sectionName);
@@ -768,15 +1030,22 @@ function renderShiftGroups(role, sectionName, groups) {
     </div>
   `).join('');
 }
+
+// ── SHIFT VIEW ──
 function renderShift() {
   const products = getShiftProducts();
+  const manageBtn = isEditor
+    ? `<button class="btn-shift-products" onclick="openShiftProductsModal()">⚙️ Управление продуктами</button>` : '';
+
+  const waSvg = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.098.544 4.07 1.496 5.789L.057 23.854c-.073.274.196.537.468.457l6.186-1.602A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.028-1.383l-.36-.214-3.732.966.999-3.626-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>`;
+
   document.getElementById('mainContent').innerHTML = `
     <div class="section-header">
       <div class="section-header-left">
         <button class="btn-back" onclick="goHome()">← Назад</button>
         <h1 class="section-title">📦 Учёт смены</h1>
       </div>
-      <button class="btn-shift-products" onclick="openShiftProductsModal()">⚙️ Управление продуктами</button>
+      ${manageBtn}
     </div>
     <div class="shift-wrap">
       <div class="shift-tabs">
@@ -806,15 +1075,8 @@ function renderShift() {
           <div id="b-wo"><input class="writeoff-inp" type="text" placeholder="Что списали и сколько..."></div>
           <button class="s-add-btn" onclick="addWO('b-wo')">+ Добавить строку</button>
         </div>
-        <div class="card">
-          <div class="card-title">🛒 Закуп на завтра</div>
-          <div id="b-zakup"><input class="writeoff-inp" type="text" placeholder="Что нужно купить..."></div>
-          <button class="s-add-btn" onclick="addWO('b-zakup','Что нужно купить...')">+ Добавить строку</button>
-        </div>
-        <button class="send-btn" onclick="sendWA('barista')">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.098.544 4.07 1.496 5.789L.057 23.854c-.073.274.196.537.468.457l6.186-1.602A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.028-1.383l-.36-.214-3.732.966.999-3.626-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
-          Отправить в WhatsApp
-        </button>
+        <button class="btn-checklist" onclick="openChecklist('barista')">📋 Чек-лист закупа <span class="cl-count" id="cl-count-barista" style="display:none;">0</span></button>
+        <button class="send-btn" onclick="sendWA('barista')">${waSvg} Отправить в WhatsApp</button>
         <p class="hint">✏️ нажми чтобы изменить название позиции</p>
       </div>
 
@@ -836,23 +1098,22 @@ function renderShift() {
           ${renderShiftGroups('cook', 'production', products.cook)}
         </div>
         <div class="card">
-          <div class="card-title">🛒 Закуп на завтра</div>
-          <div id="c-zakup"><input class="writeoff-inp" type="text" placeholder="Что нужно купить..."></div>
-          <button class="s-add-btn" onclick="addWO('c-zakup','Что нужно купить...')">+ Добавить строку</button>
+          <div class="card-title">🗑 Списания за смену</div>
+          <div id="c-wo"><input class="writeoff-inp" type="text" placeholder="Что списали и сколько..."></div>
+          <button class="s-add-btn" onclick="addWO('c-wo')">+ Добавить строку</button>
         </div>
-        <button class="send-btn" onclick="sendWA('cook')">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.098.544 4.07 1.496 5.789L.057 23.854c-.073.274.196.537.468.457l6.186-1.602A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.028-1.383l-.36-.214-3.732.966.999-3.626-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
-          Отправить в WhatsApp
-        </button>
+        <button class="btn-checklist" onclick="openChecklist('cook')">📋 Чек-лист закупа <span class="cl-count" id="cl-count-cook" style="display:none;">0</span></button>
+        <button class="send-btn" onclick="sendWA('cook')">${waSvg} Отправить в WhatsApp</button>
         <p class="hint">✏️ нажми чтобы изменить название позиции</p>
       </div>
     </div>`;
 
   const d = new Date();
-  const dateStr = d.toISOString().split('T')[0];
-  const timeStr = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
   ['b-date','c-date'].forEach(id => { const el = document.getElementById(id); if(el) el.value = dateStr; });
   ['b-time','c-time'].forEach(id => { const el = document.getElementById(id); if(el) el.value = timeStr; });
+  updateChecklistCounters();
 }
 
 function switchTab(role, btn) {
@@ -863,6 +1124,128 @@ function switchTab(role, btn) {
   document.getElementById('form-' + role).classList.add('active');
 }
 
+// ── CHECKLIST ──
+function countChecked(role) {
+  return Object.keys(checkedPurchase[role] || {}).filter(k => checkedPurchase[role][k]).length;
+}
+function updateChecklistCounters() {
+  ['barista','cook'].forEach(role => {
+    const el = document.getElementById('cl-count-' + role);
+    if (!el) return;
+    const n = countChecked(role);
+    el.textContent = n;
+    el.style.display = n > 0 ? '' : 'none';
+  });
+}
+function openChecklist(role) {
+  checklistRole = role;
+  document.getElementById('checklistTitle').textContent =
+    'Чек-лист закупа — ' + (role === 'barista' ? 'Бариста-кассир' : 'Повар');
+  document.getElementById('clToolbar').innerHTML = isEditor
+    ? `<button class="btn-cl-edit" onclick="openChecklistEditor()">✏️ Редактировать список</button>` : '';
+  renderChecklist();
+  document.getElementById('checklistModal').classList.add('active');
+}
+function renderChecklist() {
+  const cl = getChecklist()[checklistRole] || [];
+  const checked = checkedPurchase[checklistRole] || {};
+  const html = cl.length ? cl.map(group => `
+    <div class="cl-group-label">${esc(group.name)}</div>
+    ${group.items.map(item => `
+      <label class="cl-row ${checked[item.id] ? 'checked' : ''}">
+        <input class="cl-cb" type="checkbox" ${checked[item.id] ? 'checked' : ''}
+               onchange="toggleChecked('${item.id}', this.checked, this)">
+        <span class="cl-name">${esc(item.name)}</span>
+        <span class="cl-min">мин. ${esc(item.min || '—')}</span>
+      </label>
+    `).join('')}
+  `).join('') : '<div class="empty-state compact">Список пуст</div>';
+  document.getElementById('checklistContent').innerHTML = html;
+}
+function toggleChecked(itemId, val, el) {
+  if (!checkedPurchase[checklistRole]) checkedPurchase[checklistRole] = {};
+  if (val) checkedPurchase[checklistRole][itemId] = true;
+  else delete checkedPurchase[checklistRole][itemId];
+  const row = el.closest('.cl-row');
+  if (row) row.classList.toggle('checked', val);
+}
+function resetChecklist() {
+  checkedPurchase[checklistRole] = {};
+  renderChecklist();
+  updateChecklistCounters();
+}
+function closeChecklist() {
+  closeModal('checklistModal');
+  updateChecklistCounters();
+  const n = countChecked(checklistRole);
+  if (n > 0) showToast('В закуп добавлено позиций: ' + n);
+}
+function getCheckedItems(role) {
+  const cl = getChecklist()[role] || [];
+  const checked = checkedPurchase[role] || {};
+  const out = [];
+  cl.forEach(group => group.items.forEach(item => {
+    if (checked[item.id]) out.push({ group: group.name, name: item.name, min: item.min });
+  }));
+  return out;
+}
+
+// ── CHECKLIST EDITOR ──
+function openChecklistEditor() {
+  checklistDraft = getChecklist();
+  document.getElementById('checklistEditTitle').textContent =
+    'Чек-лист — ' + (checklistRole === 'barista' ? 'Бариста-кассир' : 'Повар');
+  renderChecklistEditor();
+  document.getElementById('checklistEditModal').classList.add('active');
+}
+function renderChecklistEditor() {
+  const groups = checklistDraft[checklistRole] || [];
+  const html = groups.length ? groups.map((group, gi) => `
+    <div class="cle-group">
+      <div class="cle-group-head">
+        <input class="cle-group-name" type="text" value="${esc(group.name)}"
+               oninput="clEditGroupName(${gi}, this.value)">
+        <button class="cle-group-del" onclick="clDeleteGroup(${gi})">Удалить</button>
+      </div>
+      ${group.items.map((item, ii) => `
+        <div class="cle-row">
+          <input class="cle-name" type="text" value="${esc(item.name)}" placeholder="Название"
+                 oninput="clEditItem(${gi}, ${ii}, 'name', this.value)">
+          <input class="cle-min" type="text" value="${esc(item.min || '')}" placeholder="мин."
+                 oninput="clEditItem(${gi}, ${ii}, 'min', this.value)">
+          <button class="cle-del" onclick="clDeleteItem(${gi}, ${ii})">×</button>
+        </div>`).join('')}
+      <button class="s-add-btn" onclick="clAddItem(${gi})">+ Добавить позицию</button>
+    </div>
+  `).join('') : '<div class="empty-state compact">Групп пока нет</div>';
+  document.getElementById('checklistEditContent').innerHTML =
+    html + `<button class="s-add-btn" onclick="clAddGroup()">+ Добавить группу</button>`;
+}
+function clEditGroupName(gi, val) { checklistDraft[checklistRole][gi].name = val; }
+function clEditItem(gi, ii, field, val) { checklistDraft[checklistRole][gi].items[ii][field] = val; }
+function clDeleteItem(gi, ii) { checklistDraft[checklistRole][gi].items.splice(ii, 1); renderChecklistEditor(); }
+function clAddItem(gi) {
+  checklistDraft[checklistRole][gi].items.push({ id: 'cl_' + Date.now(), name: '', min: '' });
+  renderChecklistEditor();
+}
+function clDeleteGroup(gi) { checklistDraft[checklistRole].splice(gi, 1); renderChecklistEditor(); }
+function clAddGroup() {
+  checklistDraft[checklistRole].push({ id: 'clg_' + Date.now(), name: 'Новая группа', items: [] });
+  renderChecklistEditor();
+}
+function saveChecklistEdits() {
+  ['barista','cook'].forEach(role => {
+    checklistDraft[role] = (checklistDraft[role] || []).map(g => ({
+      ...g, items: (g.items || []).filter(i => (i.name || '').trim() !== '')
+    }));
+  });
+  setChecklist(checklistDraft);
+  closeModal('checklistEditModal');
+  renderChecklist();
+  showToast('Чек-лист сохранён. Нажми «Опубликовать для сотрудников»');
+}
+
+// ── SHIFT PRODUCTS MANAGER ──
 function openShiftProductsModal() {
   currentShiftProductsRole = 'barista';
   document.getElementById('shiftProductsModal').classList.add('active');
@@ -948,9 +1331,10 @@ function saveShiftProducts() {
   setShiftProducts(getShiftProducts());
   closeModal('shiftProductsModal');
   renderShift();
-  showToast('Продукты обновлены');
+  showToast('Продукты обновлены. Нажми «Опубликовать для сотрудников»');
 }
 
+// ── ROW HELPERS ──
 function toggleEdit(btn) {
   const row = btn.closest('.item-row');
   const sp = row.querySelector('.sitem-name');
@@ -971,18 +1355,7 @@ function toggleEdit(btn) {
     btn.textContent = '✔️';
   }
 }
-
 function delRow(btn) { btn.closest('.item-row').remove(); }
-
-function addRow(lid) {
-  const list = document.getElementById(lid);
-  const row = document.createElement('div');
-  row.className = 'item-row';
-  row.innerHTML = '<span class="sitem-name">Новая позиция</span><button class="edit-btn" onclick="toggleEdit(this)">✏️</button><input class="num-inp" type="number" placeholder="0" min="0"><select class="unit-sel"><option>шт</option><option>кг</option><option>г</option><option>л</option><option>мл</option><option>пач</option></select><button class="del-btn" onclick="delRow(this)">×</button>';
-  list.appendChild(row);
-  toggleEdit(row.querySelector('.edit-btn'));
-}
-
 function addWO(lid, placeholder) {
   const list = document.getElementById(lid);
   const i = document.createElement('input');
@@ -990,7 +1363,6 @@ function addWO(lid, placeholder) {
   i.placeholder = placeholder || 'Что списали и сколько...';
   list.appendChild(i); i.focus();
 }
-
 function getRows(lid) {
   const rows = [];
   document.querySelectorAll('#' + lid + ' .item-row').forEach(r => {
@@ -1002,54 +1374,54 @@ function getRows(lid) {
   });
   return rows;
 }
-
 function fmtDate(val) {
   if (!val) return '—';
   const p = val.split('-');
   return p[2] + '.' + p[1] + '.' + p[0];
 }
 
+// ── WHATSAPP ──
 function sendWA(role) {
   const SEP = '━━━━━━━━━━━━━━━';
-  let msg = '';
-  if (role === 'barista') {
-    const name = document.getElementById('b-name').value.trim() || '—';
-    const date = fmtDate(document.getElementById('b-date').value);
-    const time = document.getElementById('b-time').value || '—';
-    msg = '☕ *ОТЧЁТ БАРИСТЫ — GOOD DOG*\n';
-    msg += '👤 ' + name + '\n📅 ' + date + ' | ⏰ ' + time + '\n' + SEP + '\n';
-    msg += '📦 *ОСТАТКИ НА КОНЕЦ СМЕНЫ*\n\n_Сухие / сыпучие:_\n';
-    getRows('b-dry').forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
-    msg += '\n_Жидкие:_\n';
-    getRows('b-liquid').forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
-    msg += '\n_Стаканы:_\n';
-    getRows('b-cups').forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
-    msg += SEP + '\n🍵 *ПРОИЗВОДСТВО*\n';
-    getRows('b-prod').forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
-    const wo = [];
-    document.querySelectorAll('#b-wo input').forEach(i => { if (i.value.trim()) wo.push(i.value.trim()); });
-    if (wo.length) { msg += SEP + '\n🗑 *СПИСАНИЯ*\n'; wo.forEach(w => { msg += '▸ ' + w + '\n'; }); }
-    const zakup = [];
-    document.querySelectorAll('#b-zakup input').forEach(i => { if (i.value.trim()) zakup.push(i.value.trim()); });
-    if (zakup.length) { msg += SEP + '\n🛒 *ЗАКУП НА ЗАВТРА*\n'; zakup.forEach(w => { msg += '▸ ' + w + '\n'; }); }
-  } else {
-    const name = document.getElementById('c-name').value.trim() || '—';
-    const date = fmtDate(document.getElementById('c-date').value);
-    const time = document.getElementById('c-time').value || '—';
-    msg = '🌭 *ОТЧЁТ ПОВАРА — GOOD DOG*\n';
-    msg += '👤 ' + name + '\n📅 ' + date + ' | ⏰ ' + time + '\n' + SEP + '\n';
-    msg += '📦 *ОСТАТКИ НА КОНЕЦ СМЕНЫ*\n\n_Хлеб и выпечка:_\n';
-    getRows('c-bread').forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
-    msg += '\n_Мясо и полуфабрикаты:_\n';
-    getRows('c-meat').forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
-    msg += '\n_Соусы:_\n';
-    getRows('c-sauce').forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
-    msg += SEP + '\n🥗 *ПРОИЗВОДСТВО*\n';
-    getRows('c-prod').forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
-    const zakup = [];
-    document.querySelectorAll('#c-zakup input').forEach(i => { if (i.value.trim()) zakup.push(i.value.trim()); });
-    if (zakup.length) { msg += SEP + '\n🛒 *ЗАКУП НА ЗАВТРА*\n'; zakup.forEach(w => { msg += '▸ ' + w + '\n'; }); }
+  const prefix = role === 'barista' ? 'b' : 'c';
+  const products = getShiftProducts()[role] || [];
+  const name = (document.getElementById(prefix + '-name').value || '').trim() || '—';
+  const date = fmtDate(document.getElementById(prefix + '-date').value);
+  const time = document.getElementById(prefix + '-time').value || '—';
+
+  let msg = role === 'barista'
+    ? '☕ *ОТЧЁТ БАРИСТЫ — GOOD DOG*\n'
+    : '🌭 *ОТЧЁТ ПОВАРА — GOOD DOG*\n';
+  msg += '👤 ' + name + '\n📅 ' + date + ' | ⏰ ' + time + '\n' + SEP + '\n';
+
+  msg += '📦 *ОСТАТКИ НА КОНЕЦ СМЕНЫ*\n';
+  products.filter(g => g.section === 'stock').forEach(g => {
+    msg += '\n_' + g.name + ':_\n';
+    getRows(prefix + '-' + g.id).forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
+  });
+
+  const prodGroups = products.filter(g => g.section === 'production');
+  if (prodGroups.length) {
+    msg += SEP + '\n' + (role === 'barista' ? '🍵' : '🥗') + ' *ПРОИЗВОДСТВО*\n';
+    prodGroups.forEach(g => {
+      getRows(prefix + '-' + g.id).forEach(r => { msg += '▸ ' + r.name + ': ' + r.num + ' ' + r.unit + '\n'; });
+    });
   }
+
+  const wo = [];
+  document.querySelectorAll('#' + prefix + '-wo input').forEach(i => { if (i.value.trim()) wo.push(i.value.trim()); });
+  if (wo.length) { msg += SEP + '\n🗑 *СПИСАНИЯ*\n'; wo.forEach(w => { msg += '▸ ' + w + '\n'; }); }
+
+  const fromChecklist = getCheckedItems(role);
+  if (fromChecklist.length) {
+    msg += SEP + '\n🛒 *ЗАКУП НА ЗАВТРА*\n';
+    let lastGroup = '';
+    fromChecklist.forEach(it => {
+      if (it.group !== lastGroup) { msg += '\n_' + it.group + ':_\n'; lastGroup = it.group; }
+      msg += '▸ ' + it.name + ' (мин. ' + (it.min || '—') + ')\n';
+    });
+  }
+
   const url = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
     ? 'whatsapp://send?text=' + encodeURIComponent(msg)
     : 'https://wa.me/?text=' + encodeURIComponent(msg);
@@ -1066,17 +1438,25 @@ function doLogin() {
   const pass = document.getElementById('loginPassword').value;
   if (pass === getPassword()) {
     isEditor = true; closeModal('loginModal'); updateHeader();
-    if (currentSection) renderSection(); else renderHome();
+    if (currentCard) renderCard(); else if (currentSection) renderSection(); else renderHome();
     showToast('Вы вошли как редактор');
   } else { showToast('Неверный пароль', true); }
 }
 function doLogout() {
   isEditor = false; updateHeader();
-  if (currentSection) renderSection(); else renderHome();
+  document.getElementById('saveBar').classList.remove('visible');
+  if (currentCard) renderCard(); else if (currentSection) renderSection(); else renderHome();
   showToast('Вы вышли');
 }
 function updateHeader() {
-  document.getElementById('headerRight').innerHTML = '';
+  const el = document.getElementById('headerRight');
+  if (isEditor) {
+    el.innerHTML = `<span class="editor-badge">Редактор</span>
+      <button class="btn-settings" onclick="openSettingsModal()">⚙️</button>
+      <button class="btn-logout" onclick="doLogout()">Выйти</button>`;
+  } else {
+    el.innerHTML = `<button class="btn-login" onclick="openLoginModal()">Войти</button>`;
+  }
 }
 
 // ── SETTINGS ──
@@ -1144,9 +1524,9 @@ function confirmDelete() {
 async function saveToGithub() {
   const token = getSetting(TOKEN_KEY);
   const repo  = getSetting(REPO_KEY, 'qamarjora/gooddog-hq');
-  if (!token) { showToast('Укажи GitHub токен в настройках ⚙️', true); if (isEditor) openSettingsModal(); return; }
+  if (!token) { showToast('Укажи GitHub токен в настройках', true); if (isEditor) openSettingsModal(); return; }
   const btn = document.getElementById('btnGithubSave');
-  btn.disabled = true; btn.textContent = '⏳ Сохранение...';
+  btn.disabled = true; btn.textContent = '⏳ Публикую...';
   try {
     const data = getData();
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
@@ -1160,10 +1540,10 @@ async function saveToGithub() {
       headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
       body: JSON.stringify({ message: `Update ${new Date().toLocaleDateString('ru-RU')}`, content, ...(sha ? { sha } : {}) })
     });
-    if (putRes.ok) { document.getElementById('saveBar').classList.remove('visible'); showToast('✅ Сохранено в GitHub'); }
+    if (putRes.ok) { document.getElementById('saveBar').classList.remove('visible'); showToast('Опубликовано. Сотрудники увидят после обновления страницы'); }
     else { const e = await putRes.json(); showToast('Ошибка: ' + (e.message || 'GitHub API'), true); }
   } catch { showToast('Ошибка соединения', true); }
-  finally { btn.disabled = false; btn.textContent = '☁️ Сохранить в GitHub'; }
+  finally { btn.disabled = false; btn.textContent = '⬆️ Опубликовать для сотрудников'; }
 }
 
 // ── HELPERS ──
@@ -1183,7 +1563,7 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
 async function loadFromGithub() {
   const repo = getSetting(REPO_KEY, 'qamarjora/gooddog-hq');
   try {
-    const res = await fetch(`https://api.github.com/repos/${repo}/contents/data.json`, {
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/data.json?t=` + Date.now(), {
       headers: { 'Accept': 'application/vnd.github.v3+json' }
     });
     if (res.ok) {
@@ -1191,8 +1571,10 @@ async function loadFromGithub() {
       const decoded = decodeURIComponent(escape(atob(json.content.replace(/\n/g, ''))));
       const data = JSON.parse(decoded);
       localStorage.setItem(DATA_KEY, JSON.stringify(data));
+      shiftProductsCache = null;
     }
   } catch { /* тихо — работаем с localStorage */ }
+  updateHeader();
   renderHome();
 }
 
