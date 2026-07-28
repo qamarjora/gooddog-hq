@@ -24,20 +24,13 @@ body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--t
 
 /* HEADER */
 header {
-  background: var(--g); padding: 0 20px; height: 56px;
+  background: var(--white); border-bottom: 1.5px solid var(--bd); padding: 0 20px; height: 60px;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 100;
 }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
-.logo-bars { display: flex; gap: 3px; align-items: flex-end; }
-.logo-bars span { display: block; width: 4px; background: var(--y); border-radius: 2px; }
-.logo-bars span:nth-child(1) { height: 12px; }
-.logo-bars span:nth-child(2) { height: 18px; }
-.logo-bars span:nth-child(3) { height: 22px; }
-.logo-bars span:nth-child(4) { height: 18px; }
-.logo-bars span:nth-child(5) { height: 12px; }
-.logo-text { color: var(--white); font-size: 14px; font-weight: 800; letter-spacing: 0.05em; }
-.logo-text span { color: var(--y); }
+.logo { display: flex; align-items: center; gap: 9px; text-decoration: none; cursor: pointer; }
+.logo img { height: 30px; display: block; }
+.logo-hq { background: var(--g); color: var(--y); font-size: 12px; font-weight: 800; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 6px; }
 .header-right { display: flex; align-items: center; gap: 8px; }
 .btn-login {
   background: transparent; border: 1.5px solid rgba(255,255,255,0.3);
@@ -448,8 +441,8 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 
 <header>
   <div class="logo" onclick="goHome()">
-    <div class="logo-bars"><span></span><span></span><span></span><span></span><span></span></div>
-    <div class="logo-text">GOOD DOG <span>HQ</span></div>
+    <img src="logo.png" alt="Good Dog">
+    <span class="logo-hq">HQ</span>
   </div>
   <div class="header-right" id="headerRight"></div>
 </header>
