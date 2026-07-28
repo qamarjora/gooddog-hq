@@ -847,6 +847,7 @@ function setChecklist(cl) {
 // ── NAV ──
 function goHome() { currentSection = null; currentCard = null; renderHome(); }
 function openSection(id) {
+  if (id === 'regs') { window.location.href = 'reglament.html'; return; }
   const data = getData();
   currentSection = data.sections.find(s => s.id === id);
   currentCard = null;
