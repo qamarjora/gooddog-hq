@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#093023">
+<title>Good Dog HQ · Регламенты смены</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#093023; --gm:#0d4a32; --y:#f5c518;
+  --white:#fff; --bg:#f6f6f3;
+  --text:#1a1a1a; --mu:#8a8f8b;
+  --bd:rgba(9,48,35,.1); --dv:#ededea;
+  --shadow:0 2px 10px rgba(9,48,35,.07);
+  --shadow-h:0 6px 20px rgba(9,48,35,.13);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+header{
+  background:var(--white);border-bottom:1.5px solid var(--bd);
+  height:60px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;position:sticky;top:0;z-index:50;
+}
+.brand{display:flex;align-items:center;gap:9px;cursor:pointer}
+.brand img{height:30px;display:block}
+.hq{background:var(--g);color:var(--y);font-size:12px;font-weight:800;letter-spacing:.05em;padding:3px 8px;border-radius:6px}
+
+main{padding:24px 16px 60px;max-width:600px;margin:0 auto}
+
+/* HOME */
+.home-head{margin-bottom:22px}
+.home-head h1{font-size:22px;font-weight:800;color:var(--g);margin-bottom:3px}
+.home-head p{font-size:13px;color:var(--mu)}
+
+.role-group{margin-bottom:22px}
+.role-label{
+  display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;
+  color:var(--g);text-transform:uppercase;letter-spacing:.05em;margin-bottom:11px;padding-left:2px;
+}
+.role-label .ic{font-size:17px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.tile{
+  background:var(--white);border:1.5px solid var(--bd);border-radius:15px;
+  padding:18px 16px;cursor:pointer;transition:.18s;text-align:left;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:10px;min-height:104px;justify-content:space-between;
+}
+.tile:hover{border-color:var(--g);box-shadow:var(--shadow-h);transform:translateY(-2px)}
+.tile:active{transform:translateY(0)}
+.tile-badge{
+  width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;
+}
+.tile-badge.open{background:rgba(245,197,24,.18)}
+.tile-badge.close{background:rgba(9,48,35,.08)}
+.tile-name{font-size:15px;font-weight:800;color:var(--g)}
+.tile-sub{font-size:12px;color:var(--mu);font-weight:600;margin-top:2px}
+
+.tile-wide{
+  grid-column:1 / -1;flex-direction:row;align-items:center;gap:14px;min-height:0;padding:16px 18px;
+}
+.tile-wide .tile-badge{background:rgba(9,48,35,.08);flex-shrink:0}
+.tile-wide .arrow{margin-left:auto;color:var(--mu);font-size:22px}
+
+/* DOC */
+.doc-view{display:none}
+.doc-view.active{display:block}
+.home-view.hidden{display:none}
+.btn-back{
+  background:var(--white);border:1.5px solid var(--bd);color:var(--text);
+  padding:9px 15px;border-radius:10px;font-family:inherit;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:6px;margin-bottom:20px;
+}
+.btn-back:hover{border-color:var(--g);color:var(--g)}
+.doc-title{
+  display:flex;align-items:baseline;gap:10px;padding:2px 4px 18px;
+  border-bottom:2px solid var(--g);margin-bottom:22px;
+}
+.doc-title h1{font-size:22px;font-weight:800;color:var(--g);letter-spacing:-.01em}
+.doc-title .role-tag{font-size:14px;font-weight:700;color:var(--mu)}
+
+.block{margin-bottom:26px}
+.block-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.block-num{
+  width:26px;height:26px;border-radius:8px;background:var(--g);color:var(--y);
+  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.block-title{font-size:16px;font-weight:800;color:var(--g)}
+.block ul{list-style:none;padding-left:36px}
+.block li{
+  position:relative;font-size:15px;line-height:1.55;font-weight:500;color:var(--text);
+  padding:7px 0;border-bottom:1px solid var(--dv);
+}
+.block li:last-child{border-bottom:none}
+.block li::before{content:'';position:absolute;left:-18px;top:15px;width:6px;height:6px;border-radius:50%;background:var(--y)}
+
+.foot{text-align:center;color:var(--mu);font-size:12px;font-weight:600;padding:10px 0 0;border-top:1px solid var(--dv);margin-top:30px}
+
+@media print{
+  header{position:static}
+  .btn-back{display:none}
+  body{background:#fff}
+}
+@media (max-width:600px){
+  .doc-title h1{font-size:20px}
+  .block-title{font-size:15px}
+  .block li{font-size:14.5px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand" onclick="goHome()">
+    <img src="data:image/png;base64,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" alt="Good Dog">
+    <span class="hq">HQ</span>
+  </div>
+</header>
+
+<main>
+  <div class="home-view" id="homeView">
+    <div class="home-head">
+      <h1>Регламенты смены</h1>
+      <p>Выбери роль и момент смены</p>
+    </div>
+
+    <div class="role-group">
+      <div class="role-label"><span class="ic">🌭</span>Повар</div>
+      <div class="tiles">
+        <button class="tile" onclick="openDoc('cook','open')">
+          <div class="tile-badge open">☀️</div>
+          <div><div class="tile-name">Открытие</div><div class="tile-sub">Начало смены</div></div>
+        </button>
+        <button class="tile" onclick="openDoc('cook','close')">
+          <div class="tile-badge close">🌙</div>
+          <div><div class="tile-name">Закрытие</div><div class="tile-sub">Конец смены</div></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="role-group">
+      <div class="role-label"><span class="ic">☕</span>Бариста-кассир</div>
+      <div class="tiles">
+        <button class="tile" onclick="openDoc('barista','open')">
+          <div class="tile-badge open">☀️</div>
+          <div><div class="tile-name">Открытие</div><div class="tile-sub">Начало смены</div></div>
+        </button>
+        <button class="tile" onclick="openDoc('barista','close')">
+          <div class="tile-badge close">🌙</div>
+          <div><div class="tile-name">Закрытие</div><div class="tile-sub">Конец смены</div></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="role-group">
+      <div class="role-label"><span class="ic">📋</span>Для всех</div>
+      <div class="tiles">
+        <button class="tile tile-wide" onclick="openRules()">
+          <div class="tile-badge">📋</div>
+          <div><div class="tile-name">Общие правила</div><div class="tile-sub">Обязательны для всех сотрудников</div></div>
+          <span class="arrow">›</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-view" id="docView">
+    <button class="btn-back" onclick="goHome()">← Назад</button>
+    <div id="docBody"></div>
+  </div>
+</main>
+
+<script>
+const DATA = {
+  cook:{
+    open:[
+      ['Подготовка · вне кухни',[
+        'Переодеться и подготовиться только вне кухни (в верхней одежде на кухню не заходить)',
+        'Собрать волосы, надеть головной убор',
+        'Вымыть руки']],
+      ['Оборудование',[
+        'Включить прижимной и роликовый гриль, дождаться рабочей температуры',
+        'Проверить уровень и цвет масла во фритюре, при необходимости заменить']],
+      ['Выкладка продуктов',[
+        'Достать из холодильника соусы, сосиски и остальные продукты',
+        'Выложить сосиски на роликовый гриль',
+        'Переложить соусы в рабочие ёмкости']],
+      ['Разморозка полуфабрикатов',[
+        'Достать из морозильника замороженные полуфабрикаты (булочки, куриные сосиски и др.)',
+        'Выложить их размораживаться заранее, чтобы успели оттаять к работе']],
+      ['Проверка свежести',[
+        'Проверить все продукты, вскрытые накануне',
+        'Продукты с признаками порчи выбросить']],
+      ['Рабочая зона',[
+        'Собрать рабочую линию, расставить всё по местам',
+        'Пройтись по чек-листу продуктов и проверить, не осталось ли позиций, которые нужно было внести в закуп накануне']],
+    ],
+    close:[
+      ['Закуп и остатки',[
+        'Пройтись по чек-листу продуктов и составить список закупа на завтра',
+        'Записать остатки']],
+      ['Убрать продукты',[
+        'Убрать салаты, добавки и вскрытые продукты в холодильник, закрыть крышками',
+        'Убрать сосиски с роликового гриля в ёмкость']],
+      ['Списания',[
+        'Если был брак или продукт упал на пол — сфотографировать и внести на списание']],
+      ['Оборудование',[
+        'Выключить прижимной гриль',
+        'Выключить роликовый гриль',
+        'Выключить фритюрницу',
+        'Дать оборудованию остыть и вымыть его',
+        'Вымыть все приборы и инвентарь']],
+      ['Уборка',[
+        'Убрать кухню и протереть рабочие поверхности',
+        'Убрать гостевую зону совместно с баристой']],
+      ['Завершение',[
+        'Вынести мусор и коробки',
+        'Отправить фото чистой кухни в WhatsApp']],
+    ],
+  },
+  barista:{
+    open:[
+      ['Подготовка · вне кухни',[
+        'Переодеться и подготовиться только вне кухни (в верхней одежде на кухню не заходить)',
+        'Собрать волосы, надеть головной убор',
+        'Вымыть руки']],
+      ['Оборудование',[
+        'Включить все необходимые аппараты',
+        'Проверить запас воды в бутылях, при нехватке — заказать']],
+      ['Заготовки и рабочее место',[
+        'Подготовить все необходимые заготовки (нарезка, разморозка и др.)',
+        'Расставить приборы и инвентарь по местам',
+        'Проверить сиропы, при необходимости заменить дозатор на полный']],
+      ['Настройка кофе',[
+        'Проверить настройку кофемолки и пролив эспрессо']],
+      ['Чистота',[
+        'Протереть рабочие поверхности и аппаратуру от пыли']],
+      ['Гостевая зона',[
+        'Протереть столы, подготовить столы и стулья']],
+      ['Агрегаторы · доставка',[
+        'Включить агрегаторы, проверить наличие всех позиций',
+        'Недоступные позиции скрыть']],
+      ['Касса',[
+        'Открыть смену в Poster, пересчитать наличные',
+        'Пересчитать остатки сырья с прошлой смены (стаканы и др.) и сверить с отчётом']],
+      ['Проверка перед открытием',[
+        'Пройтись по чек-листу продуктов и дополнить закуп, если что-то упустили накануне']],
+    ],
+    close:[
+      ['Закуп и остатки',[
+        'Пройтись по чек-листу сырья и составить список закупа на завтра',
+        'Посчитать и записать остатки']],
+      ['Уборка бара',[
+        'Убрать рабочую зону',
+        'Вымыть весь инвентарь и приборы']],
+      ['Гостевая зона',[
+        'Убрать зал совместно с поваром — по договорённости']],
+      ['Списания',[
+        'Если за день был брак или порча — сфотографировать и внести на списание']],
+      ['Оборудование',[
+        'Выключить все аппараты',
+        'Почистить кофемашину по инструкции (согласно графику чистки)']],
+      ['Касса и отчёт',[
+        'Пересчитать наличные',
+        'Закрыть смену в Poster',
+        'Сфотографировать отчёт и отправить']],
+      ['Закрытие павильона',[
+        'Выключить свет и кондиционер',
+        'Проверить, что вся техника выключена',
+        'Проверить, что окна закрыты',
+        'Вынести мусор и коробки',
+        'Отправить фото бара и зала в WhatsApp']],
+    ],
+  },
+  rules:[
+    ['Качество и стандарты',[
+      'Весь инвентарь всегда чистый и на своих местах',
+      'Напитки и блюда готовятся строго по нашим стандартам, без отклонений',
+      'Качество важнее скорости. Лучше сделать чуть медленнее, но правильно',
+      'Если при сборке заказа заметил ошибку — сразу переделать. Не рассчитывать, что гость не заметит']],
+    ['Во время заказа',[
+      'Если что-то упало на пол — не отвлекаться и не поднимать сразу. Сначала доделать заказ, потом поднять и выбросить',
+      'Во время заказа нельзя пользоваться телефоном и отвечать на звонки',
+      'Не работать в наушниках']],
+    ['Перчатки',[
+      'Между заказами перчатки снимаем, но кладём в одно определённое место, а не разбрасываем где попало']],
+  ]
+};
+
+const roleName={cook:'Повар',barista:'Бариста-кассир'};
+const modeName={open:'Открытие',close:'Закрытие'};
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function buildDoc(blocks,title,tag,footRole){
+  let html='<div class="doc-title"><h1>'+title+'</h1><span class="role-tag">'+tag+'</span></div>';
+  blocks.forEach((b,i)=>{
+    html+='<div class="block"><div class="block-head"><div class="block-num">'+(i+1)+'</div><div class="block-title">'+esc(b[0])+'</div></div><ul>';
+    b[1].forEach(item=>{html+='<li>'+esc(item)+'</li>'});
+    html+='</ul></div>';
+  });
+  html+='<div class="foot">Good Dog · '+footRole+' · '+title.toLowerCase()+'</div>';
+  return html;
+}
+
+function showDoc(){
+  document.getElementById('homeView').classList.add('hidden');
+  document.getElementById('docView').classList.add('active');
+  window.scrollTo(0,0);
+}
+function openDoc(role,mode){
+  document.getElementById('docBody').innerHTML=buildDoc(DATA[role][mode],modeName[mode],roleName[role],roleName[role].toLowerCase());
+  showDoc();
+}
+function openRules(){
+  document.getElementById('docBody').innerHTML=buildDoc(DATA.rules,'Общие правила','Все сотрудники','все сотрудники');
+  showDoc();
+}
+function goHome(){
+  document.getElementById('docView').classList.remove('active');
+  document.getElementById('homeView').classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
