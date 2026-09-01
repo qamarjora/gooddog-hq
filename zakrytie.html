@@ -176,16 +176,6 @@ const WRITEOFF_DISHES = [
   { name:'Чикаго', id:'36', type:'2', hd:true },
   { name:'Сырный', id:'37', type:'2', hd:true },
   { name:'Барбекю', id:'38', type:'2', hd:true },
-  // Комбо
-  { name:'Комбо Классика', id:'94', type:'2', hd:true },
-  { name:'Комбо Френч дог', id:'95', type:'2', hd:true },
-  { name:'Комбо Барбекю', id:'96', type:'2', hd:true },
-  { name:'Комбо Датский', id:'97', type:'2', hd:true },
-  { name:'Комбо Чикаго', id:'98', type:'2', hd:true },
-  { name:'Комбо Мексиканский', id:'99', type:'2', hd:true },
-  { name:'Комбо Коул Слоу', id:'100', type:'2', hd:true },
-  { name:'Комбо Морковный', id:'101', type:'2', hd:true },
-  { name:'Комбо Сырный', id:'102', type:'2', hd:true },
   // Кофе
   { name:'Американо 250', id:'55', type:'2' },
   { name:'Американо 350', id:'56', type:'2' },
@@ -228,15 +218,9 @@ const WRITEOFF_DISHES = [
   { name:'Киви-Лайм', id:'65', type:'2' },
   { name:'Ягодный смузи', id:'114', type:'2' },
   { name:'Каркаде Вишня', id:'79', type:'2' },
-  // Закуски и допы
+  // Закуски
   { name:'Фри', id:'20', type:'2' },
   { name:'Наггетсы', id:'21', type:'2' },
-  { name:'Халапеньо (доп)', id:'87', type:'2' },
-  { name:'Сыр (доп)', id:'88', type:'2' },
-  { name:'Жареный лук (доп)', id:'89', type:'2' },
-  { name:'Кетчуп (доп)', id:'90', type:'2' },
-  { name:'Сырный соус (доп)', id:'91', type:'2' },
-  { name:'Барбекю соус (доп)', id:'92', type:'2' },
   // Товары
   { name:'Вода', id:'17', type:'1' },
   { name:'Детский сок', id:'82', type:'1' },
@@ -418,7 +402,12 @@ function collect(role){
     date:document.getElementById(role+'-date').value,
     time:document.getElementById(role+'-time').value||'—',
     remainders:remainders, prodReport:prodReport, woReport:woReport, zakup:zakup,
-    payload:{ role:role, manufacture:manufacture, writeoff:writeoff, fact:fact }
+    payload:{ role:role, manufacture:manufacture, writeoff:writeoff, fact:fact,
+      names:{
+        manufacture: prodReport.map(function(r){return r.name+' × '+r.num;}),
+        writeoff: woReport.map(function(r){return r.name+' × '+r.num;})
+      }
+    }
   };
 }
 
