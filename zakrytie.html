@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#093023">
+<title>Закрытие смены — Good Dog</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#093023; --gm:#0d4a32; --y:#ffcc00; --white:#fff; --bg:#f8f8f6;
+  --text:#1a1a1a; --mu:#888; --bd:rgba(9,48,35,0.12); --dv:#efefeb;
+  --ibg:#fafaf8; --red:#e24b4a; --radius:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:'Manrope',sans-serif;background:var(--white);color:var(--text);-webkit-font-smoothing:antialiased;}
+header{background:var(--g);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;}
+.logo-bars{display:flex;gap:3px;align-items:flex-end;}
+.logo-bars span{display:block;width:4px;background:var(--y);border-radius:2px;}
+.logo-bars span:nth-child(1){height:12px;}.logo-bars span:nth-child(2){height:18px;}
+.logo-bars span:nth-child(3){height:22px;}.logo-bars span:nth-child(4){height:18px;}
+.logo-bars span:nth-child(5){height:12px;}
+.logo-text{color:var(--white);font-size:14px;font-weight:800;letter-spacing:.05em;}
+.logo-text span{color:var(--y);}
+.back-link{color:rgba(255,255,255,.7);font-size:13px;font-weight:600;text-decoration:none;}
+.back-link:hover{color:var(--y);}
+main{max-width:520px;margin:0 auto;padding:20px 14px 90px;}
+h1.page-title{font-size:20px;font-weight:800;color:var(--g);margin-bottom:4px;}
+.subtitle{color:var(--mu);font-size:13px;margin-bottom:18px;}
+.tabs{display:flex;gap:0;margin-bottom:18px;border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;}
+.tab{flex:1;padding:11px;background:var(--white);border:none;font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;color:var(--mu);cursor:pointer;transition:all .2s;}
+.tab.active{background:var(--g);color:var(--white);}
+.form{display:none;flex-direction:column;gap:12px;}
+.form.active{display:flex;}
+.card{background:var(--white);border:1.5px solid var(--bd);border-radius:16px;padding:14px 16px;box-shadow:0 1px 4px rgba(9,48,35,.05);}
+.card-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.group-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);padding:10px 0 6px;}
+.dt-row{display:flex;gap:8px;}
+.dt-inp{flex:1;font-size:14px;font-family:'Manrope',sans-serif;border:.5px solid var(--bd);border-radius:10px;padding:9px 12px;background:var(--ibg);color:var(--text);outline:none;}
+.dt-inp:focus{border-color:var(--g);}
+.name-field{display:flex;align-items:center;gap:6px;padding:8px 0;}
+.nf-label{font-size:12px;color:var(--mu);width:60px;flex-shrink:0;}
+.nf-inp{flex:1;font-size:14px;font-family:'Manrope',sans-serif;border:none;border-bottom:1px solid var(--bd);background:transparent;color:var(--text);outline:none;padding:2px 0;}
+.nf-inp:focus{border-color:var(--g);}
+.row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--dv);}
+.row:last-of-type{border-bottom:none;}
+.row-name{font-size:13px;font-weight:500;color:var(--text);flex:1;min-width:0;}
+.pid-badge{font-size:9px;color:var(--g);background:rgba(9,48,35,.07);border-radius:5px;padding:2px 5px;font-weight:700;}
+.num-inp{width:60px;font-size:13px;font-family:'Manrope',sans-serif;border:.5px solid var(--bd);border-radius:8px;padding:6px 7px;text-align:right;background:var(--ibg);color:var(--text);outline:none;-moz-appearance:textfield;}
+.num-inp::-webkit-outer-spin-button,.num-inp::-webkit-inner-spin-button{-webkit-appearance:none;}
+.num-inp:focus{border-color:var(--g);}
+.unit{font-size:11px;color:var(--mu);width:34px;flex-shrink:0;}
+.wo-row{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.wo-sel{flex:1;font-size:13px;font-family:'Manrope',sans-serif;border:1px solid var(--bd);border-radius:8px;padding:8px 9px;background:var(--white);color:var(--text);outline:none;min-width:0;}
+.wo-sel:focus{border-color:var(--g);}
+.wo-num{width:52px;font-size:13px;font-family:'Manrope',sans-serif;border:1px solid var(--bd);border-radius:8px;padding:7px;text-align:right;background:var(--ibg);color:var(--text);outline:none;-moz-appearance:textfield;}
+.wo-num::-webkit-outer-spin-button,.wo-num::-webkit-inner-spin-button{-webkit-appearance:none;}
+.wo-del{border:none;background:transparent;color:#b45309;cursor:pointer;font-size:18px;line-height:1;padding:0 4px;flex-shrink:0;}
+.add-btn{width:100%;margin-top:8px;padding:9px;font-size:13px;font-family:'Manrope',sans-serif;font-weight:600;color:var(--g);background:rgba(9,48,35,.05);border:1px dashed rgba(9,48,35,.25);border-radius:10px;cursor:pointer;}
+.add-btn:active{background:rgba(9,48,35,.1);}
+.sausage-box{margin-top:12px;padding:12px;background:var(--ibg);border:1px solid var(--bd);border-radius:12px;}
+.sausage-title{font-size:11px;font-weight:700;color:var(--g);margin-bottom:8px;}
+.hint{font-size:11px;color:var(--mu);text-align:center;margin-top:6px;}
+.hint.warn{color:var(--red);font-weight:600;}
+.wo-inp{width:100%;font-size:13px;font-family:'Manrope',sans-serif;border:.5px solid var(--bd);border-radius:10px;padding:9px 12px;background:var(--ibg);color:var(--text);outline:none;margin-bottom:7px;display:block;}
+.wo-inp:focus{border-color:var(--g);}
+.send-btn{width:100%;padding:15px;background:var(--g);color:var(--y);border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;margin-top:4px;}
+.send-btn:active{transform:scale(.98);}
+.send-btn:disabled{opacity:.6;}
+.send-btn svg{width:22px;height:22px;flex-shrink:0;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--g);color:var(--white);padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:300;transition:transform .3s;max-width:92%;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--red);}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">
+    <div class="logo-bars"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="logo-text">GOOD DOG <span>HQ</span></div>
+  </a>
+  <a class="back-link" href="index.html">← В меню</a>
+</header>
+
+<main>
+  <h1 class="page-title">🌙 Закрытие смены</h1>
+  <p class="subtitle">Остатки, производство и списания. Одна кнопка — отчёт в WhatsApp и учёт в Poster.</p>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-barista" onclick="switchRole('barista')">☕ Бариста</button>
+    <button class="tab" id="tab-cook" onclick="switchRole('cook')">🌭 Повар</button>
+  </div>
+
+  <div id="form-barista" class="form active"></div>
+  <div id="form-cook" class="form"></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ НАСТРОЙКИ ============
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwyOVRrfTJ65Y9QSQF9fCTAv4cNQuY_Mbg_9PYroMG8XULgSunvkAx404LTHuJWfNAj/exec';
+
+// Остатки на конец смены. posterId — только у сверяемых позиций (10 ключевых).
+const REMAINDERS = {
+  barista: [
+    { group:'Сухие / сыпучие', items:[
+      { name:'Кофе', unit:'кг' },
+      { name:'Горячий шоколад', unit:'кг' },
+    ]},
+    { group:'Жидкие', items:[
+      { name:'Молоко', unit:'л' },
+      { name:'Сливки', unit:'л' },
+      { name:'Сок апельсин', unit:'л' },
+      { name:'Сок вишня', unit:'л' },
+      { name:'Каркаде Вишня', unit:'шт', pid:'177' },
+    ]},
+    { group:'Стаканы', items:[
+      { name:'Стакан 0,4', unit:'шт', pid:'111' },
+      { name:'Стакан 0,3', unit:'шт', pid:'110' },
+      { name:'Стакан 0,2', unit:'шт', pid:'112' },
+      { name:'Стакан шейкер 0,4', unit:'шт', pid:'115' },
+    ]},
+  ],
+  cook: [
+    { group:'Хлеб и выпечка', items:[
+      { name:'Булочки', unit:'шт', pid:'33' },
+      { name:'Френч', unit:'шт', pid:'46' },
+    ]},
+    { group:'Мясо и полуфабрикаты', items:[
+      { name:'Гр. сосиски', unit:'шт', pid:'175' },
+      { name:'Кр. сосиски', unit:'шт', pid:'176' },
+      { name:'Фри', unit:'пач' },
+      { name:'Жареный лук', unit:'кг' },
+      { name:'Наггетсы', unit:'пач' },
+    ]},
+    { group:'Соусы', items:[
+      { name:'Кетчуп', unit:'кг' },
+      { name:'Горчица', unit:'кг' },
+      { name:'Барбекю', unit:'кг' },
+      { name:'Сырный', unit:'кг' },
+    ]},
+  ],
+};
+
+// Производство за смену (штучно). type: 1=полуфабрикат, 2=тех.карта
+const PRODUCTION = {
+  barista: [
+    { name:'Каркаде Вишня', id:'79', type:'2' },
+  ],
+  cook: [
+    { name:'Коул слоу', id:'29', type:'1' },
+    { name:'Морковный', id:'30', type:'1' },
+    { name:'Сальса',   id:'27', type:'1' },
+  ],
+};
+
+// Сосиски (ингредиенты) для списания хот-догов
+const SAUSAGES = [
+  { name:'Говяжья', id:'175' },
+  { name:'Куриная', id:'176' },
+];
+
+// Список блюд для списания (product_id, type 2 = тех.карта; товары — type 1).
+// hd:true — хот-дог/комбо, требует выбора сосиски.
+const WRITEOFF_DISHES = [
+  // Хот-доги
+  { name:'Классический хот-дог', id:'19', type:'2', hd:true },
+  { name:'Мексиканский', id:'28', type:'2', hd:true },
+  { name:'Френч дог', id:'32', type:'2', hd:true },
+  { name:'Датский', id:'33', type:'2', hd:true },
+  { name:'Коул Слоу (хот-дог)', id:'34', type:'2', hd:true },
+  { name:'Морковный (хот-дог)', id:'35', type:'2', hd:true },
+  { name:'Чикаго', id:'36', type:'2', hd:true },
+  { name:'Сырный', id:'37', type:'2', hd:true },
+  { name:'Барбекю', id:'38', type:'2', hd:true },
+  // Комбо
+  { name:'Комбо Классика', id:'94', type:'2', hd:true },
+  { name:'Комбо Френч дог', id:'95', type:'2', hd:true },
+  { name:'Комбо Барбекю', id:'96', type:'2', hd:true },
+  { name:'Комбо Датский', id:'97', type:'2', hd:true },
+  { name:'Комбо Чикаго', id:'98', type:'2', hd:true },
+  { name:'Комбо Мексиканский', id:'99', type:'2', hd:true },
+  { name:'Комбо Коул Слоу', id:'100', type:'2', hd:true },
+  { name:'Комбо Морковный', id:'101', type:'2', hd:true },
+  { name:'Комбо Сырный', id:'102', type:'2', hd:true },
+  // Кофе
+  { name:'Американо 250', id:'55', type:'2' },
+  { name:'Американо 350', id:'56', type:'2' },
+  { name:'Американо 450', id:'57', type:'2' },
+  { name:'Капучино 250', id:'48', type:'2' },
+  { name:'Капучино 350', id:'51', type:'2' },
+  { name:'Капучино 450', id:'53', type:'2' },
+  { name:'Латте 250', id:'49', type:'2' },
+  { name:'Латте 350', id:'50', type:'2' },
+  { name:'Латте 450', id:'52', type:'2' },
+  { name:'Раф 350', id:'85', type:'2' },
+  { name:'Раф 450', id:'86', type:'2' },
+  { name:'Раф Цитрус 450', id:'106', type:'2' },
+  { name:'Флейт Уайт 250', id:'54', type:'2' },
+  { name:'Эспрессо 1 шот', id:'58', type:'2' },
+  { name:'Эспрессо 2 шот', id:'59', type:'2' },
+  // Холодное кофе
+  { name:'Айс Американо', id:'72', type:'2' },
+  { name:'Айс Латте', id:'73', type:'2' },
+  { name:'Бамбл (Апельсин)', id:'112', type:'2' },
+  { name:'Бамбл (Вишня)', id:'113', type:'2' },
+  { name:'Эспрессо Шейк', id:'76', type:'2' },
+  { name:'Эспрессо Тоник', id:'77', type:'2' },
+  // Молочные коктейли
+  { name:'Банановый шейк', id:'70', type:'2' },
+  { name:'Классический коктейль', id:'67', type:'2' },
+  { name:'Клубничный', id:'68', type:'2' },
+  { name:'Орео Шейк', id:'71', type:'2' },
+  { name:'Шоколадный', id:'69', type:'2' },
+  // Чаи
+  { name:'Чай чёрный', id:'60', type:'2' },
+  { name:'Чай зелёный', id:'61', type:'2' },
+  { name:'Малиновый чай', id:'62', type:'2' },
+  { name:'Облепиховый чай', id:'63', type:'2' },
+  { name:'Глинтвейн', id:'103', type:'2' },
+  { name:'Таёжный', id:'104', type:'2' },
+  { name:'Ягодный чай', id:'105', type:'2' },
+  // Лимонады / смузи / каркаде
+  { name:'Грейпфрут-Маракуйя', id:'64', type:'2' },
+  { name:'Киви-Лайм', id:'65', type:'2' },
+  { name:'Ягодный смузи', id:'114', type:'2' },
+  { name:'Каркаде Вишня', id:'79', type:'2' },
+  // Закуски и допы
+  { name:'Фри', id:'20', type:'2' },
+  { name:'Наггетсы', id:'21', type:'2' },
+  { name:'Халапеньо (доп)', id:'87', type:'2' },
+  { name:'Сыр (доп)', id:'88', type:'2' },
+  { name:'Жареный лук (доп)', id:'89', type:'2' },
+  { name:'Кетчуп (доп)', id:'90', type:'2' },
+  { name:'Сырный соус (доп)', id:'91', type:'2' },
+  { name:'Барбекю соус (доп)', id:'92', type:'2' },
+  // Товары
+  { name:'Вода', id:'17', type:'1' },
+  { name:'Детский сок', id:'82', type:'1' },
+];
+
+let activeRole = 'barista';
+let sending = false;
+
+// ============ РЕНДЕР ============
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function remaindersHTML(role){
+  return REMAINDERS[role].map(function(g){
+    return '<div class="group-label">'+esc(g.group)+'</div>'+
+      g.items.map(function(it){
+        const badge = it.pid ? '<span class="pid-badge">сверка</span>' : '';
+        const pid = it.pid ? ' data-pid="'+it.pid+'"' : '';
+        return '<div class="row">'+
+          '<span class="row-name">'+esc(it.name)+' '+badge+'</span>'+
+          '<input class="num-inp rem-inp" type="number" min="0" placeholder="0"'+pid+' data-name="'+esc(it.name)+'">'+
+          '<span class="unit">'+esc(it.unit)+'</span>'+
+        '</div>';
+      }).join('');
+  }).join('');
+}
+
+function productionHTML(role){
+  return PRODUCTION[role].map(function(p){
+    return '<div class="row">'+
+      '<span class="row-name">'+esc(p.name)+'</span>'+
+      '<input class="num-inp prod-inp" type="number" min="0" placeholder="0" data-id="'+p.id+'" data-type="'+p.type+'" data-name="'+esc(p.name)+'">'+
+      '<span class="unit">шт</span>'+
+    '</div>';
+  }).join('');
+}
+
+function renderForm(role){
+  const isBar = role==='barista';
+  let h = '';
+  // дата/имя
+  h += '<div class="card"><div class="card-title">🗓 Дата и время</div>'+
+       '<div class="dt-row"><input class="dt-inp" type="date" id="'+role+'-date"><input class="dt-inp" type="time" id="'+role+'-time"></div></div>';
+  h += '<div class="card"><div class="card-title">👤 Сотрудник</div>'+
+       '<div class="name-field"><span class="nf-label">Имя</span><input class="nf-inp" type="text" id="'+role+'-name" placeholder="Введите имя..."></div></div>';
+  // остатки
+  h += '<div class="card"><div class="card-title">📦 Остатки на конец смены</div>'+remaindersHTML(role)+'</div>';
+  // производство
+  h += '<div class="card"><div class="card-title">'+(isBar?'🍵':'🥗')+' Производство за смену</div>'+productionHTML(role)+'</div>';
+  // списание (только бариста)
+  if(isBar){
+    h += '<div class="card"><div class="card-title">🗑 Списание за смену</div>'+
+         '<div id="wo-list"></div>'+
+         '<button class="add-btn" onclick="addWoRow()">+ Добавить позицию</button>'+
+         '<div class="sausage-box">'+
+           '<div class="sausage-title">🌭 Сосиски (для списанных хот-догов)</div>'+
+           SAUSAGES.map(function(s){
+             return '<div class="row"><span class="row-name">'+esc(s.name)+' сосиска</span>'+
+               '<input class="num-inp saus-inp" type="number" min="0" placeholder="0" data-id="'+s.id+'" data-name="'+esc(s.name)+'" oninput="updateSausageHint()">'+
+               '<span class="unit">шт</span></div>';
+           }).join('')+
+           '<div class="hint" id="saus-hint"></div>'+
+         '</div>'+
+         '</div>';
+  }
+  // закуп
+  h += '<div class="card"><div class="card-title">🛒 Закуп на завтра</div>'+
+       '<div id="'+role+'-zakup"><input class="wo-inp" type="text" placeholder="Что нужно купить..."></div>'+
+       '<button class="add-btn" onclick="addZakup(\''+role+'\')">+ Добавить строку</button></div>';
+  // кнопка
+  h += '<button class="send-btn" id="'+role+'-send" onclick="submitReport(\''+role+'\')">'+
+       '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.098.544 4.07 1.496 5.789L.057 23.854c-.073.274.196.537.468.457l6.186-1.602A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.028-1.383l-.36-.214-3.732.966.999-3.626-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>'+
+       'Отправить отчёт</button>';
+
+  document.getElementById('form-'+role).innerHTML = h;
+
+  // дата/время по умолчанию
+  const d=new Date();
+  const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const ts=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  document.getElementById(role+'-date').value=ds;
+  document.getElementById(role+'-time').value=ts;
+
+  if(isBar){ addWoRow(); }
+}
+
+// ============ СПИСАНИЕ: строки ============
+function woOptions(){
+  return '<option value="">— выбрать блюдо —</option>'+
+    WRITEOFF_DISHES.map(function(dd,idx){
+      return '<option value="'+idx+'">'+esc(dd.name)+'</option>';
+    }).join('');
+}
+function addWoRow(){
+  const list=document.getElementById('wo-list');
+  if(!list) return;
+  const div=document.createElement('div');
+  div.className='wo-row';
+  div.innerHTML='<select class="wo-sel" onchange="updateSausageHint()">'+woOptions()+'</select>'+
+    '<input class="wo-num" type="number" min="0" placeholder="0" oninput="updateSausageHint()">'+
+    '<button class="wo-del" onclick="this.parentElement.remove();updateSausageHint()">×</button>';
+  list.appendChild(div);
+}
+function countHotdogs(){
+  let n=0;
+  document.querySelectorAll('#wo-list .wo-row').forEach(function(r){
+    const sel=r.querySelector('.wo-sel'); const num=r.querySelector('.wo-num');
+    if(sel.value===''||!num.value) return;
+    const dd=WRITEOFF_DISHES[parseInt(sel.value,10)];
+    if(dd && dd.hd) n += parseInt(num.value,10)||0;
+  });
+  return n;
+}
+function countSausages(){
+  let n=0;
+  document.querySelectorAll('.saus-inp').forEach(function(i){ n += parseInt(i.value,10)||0; });
+  return n;
+}
+function updateSausageHint(){
+  const hint=document.getElementById('saus-hint');
+  if(!hint) return;
+  const hd=countHotdogs(), s=countSausages();
+  if(hd===0 && s===0){ hint.textContent=''; hint.className='hint'; return; }
+  if(hd===s){ hint.textContent='✅ Сосиски сходятся с хот-догами ('+hd+')'; hint.className='hint'; }
+  else{ hint.textContent='⚠️ Хот-догов: '+hd+', сосисок: '+s+' — проверь'; hint.className='hint warn'; }
+}
+
+// ============ ЗАКУП ============
+function addZakup(role){
+  const list=document.getElementById(role+'-zakup');
+  const i=document.createElement('input');
+  i.className='wo-inp'; i.type='text'; i.placeholder='Что нужно купить...';
+  list.appendChild(i); i.focus();
+}
+
+// ============ СБОР ДАННЫХ ============
+function collect(role){
+  // остатки (для отчёта) + факт для сверки
+  const remainders=[]; const fact={};
+  document.querySelectorAll('#form-'+role+' .rem-inp').forEach(function(i){
+    const name=i.getAttribute('data-name'); const val=i.value.trim();
+    remainders.push({name:name, val:(val===''?'—':val)});
+    const pid=i.getAttribute('data-pid');
+    if(pid && val!==''){ fact[pid]=parseFloat(val); }
+  });
+  // производство
+  const manufacture=[]; const prodReport=[];
+  document.querySelectorAll('#form-'+role+' .prod-inp').forEach(function(i){
+    const num=parseInt(i.value,10)||0;
+    if(num>0){
+      manufacture.push({id:i.getAttribute('data-id'),type:i.getAttribute('data-type'),num:num});
+      prodReport.push({name:i.getAttribute('data-name'),num:num});
+    }
+  });
+  // списание (только бариста)
+  const writeoff=[]; const woReport=[];
+  if(role==='barista'){
+    document.querySelectorAll('#wo-list .wo-row').forEach(function(r){
+      const sel=r.querySelector('.wo-sel'); const num=parseInt(r.querySelector('.wo-num').value,10)||0;
+      if(sel.value===''||num<=0) return;
+      const dd=WRITEOFF_DISHES[parseInt(sel.value,10)];
+      writeoff.push({id:dd.id,type:dd.type,num:num});
+      woReport.push({name:dd.name,num:num});
+    });
+    document.querySelectorAll('.saus-inp').forEach(function(i){
+      const num=parseInt(i.value,10)||0;
+      if(num>0){
+        writeoff.push({id:i.getAttribute('data-id'),type:'4',num:num});
+        woReport.push({name:i.getAttribute('data-name')+' сосиска',num:num});
+      }
+    });
+  }
+  // закуп
+  const zakup=[];
+  document.querySelectorAll('#'+role+'-zakup input').forEach(function(i){ if(i.value.trim()) zakup.push(i.value.trim()); });
+
+  return {
+    role:role,
+    name:(document.getElementById(role+'-name').value.trim()||'—'),
+    date:document.getElementById(role+'-date').value,
+    time:document.getElementById(role+'-time').value||'—',
+    remainders:remainders, prodReport:prodReport, woReport:woReport, zakup:zakup,
+    payload:{ role:role, manufacture:manufacture, writeoff:writeoff, fact:fact }
+  };
+}
+
+// ============ WhatsApp текст ============
+function fmtDate(v){ if(!v) return '—'; const p=v.split('-'); return p[2]+'.'+p[1]+'.'+p[0]; }
+function buildWA(c){
+  const SEP='━━━━━━━━━━━━━━━';
+  const head=c.role==='barista'?'☕ *ОТЧЁТ БАРИСТЫ — GOOD DOG*':'🌭 *ОТЧЁТ ПОВАРА — GOOD DOG*';
+  let m=head+'\n👤 '+c.name+'\n📅 '+fmtDate(c.date)+' | ⏰ '+c.time+'\n'+SEP+'\n';
+  m+='📦 *ОСТАТКИ НА КОНЕЦ СМЕНЫ*\n';
+  c.remainders.forEach(function(r){ m+='▸ '+r.name+': '+r.val+'\n'; });
+  if(c.prodReport.length){ m+=SEP+'\n'+(c.role==='barista'?'🍵':'🥗')+' *ПРОИЗВОДСТВО*\n'; c.prodReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+' шт\n'; }); }
+  if(c.woReport.length){ m+=SEP+'\n🗑 *СПИСАНИЯ*\n'; c.woReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+'\n'; }); }
+  if(c.zakup.length){ m+=SEP+'\n🛒 *ЗАКУП НА ЗАВТРА*\n'; c.zakup.forEach(function(z){ m+='▸ '+z+'\n'; }); }
+  return m;
+}
+
+// ============ ОТПРАВКА ============
+function submitReport(role){
+  if(sending) return;
+  const c=collect(role);
+  if(c.name==='—'){ toast('Впиши имя сотрудника',true); return; }
+
+  sending=true;
+  const btn=document.getElementById(role+'-send');
+  btn.disabled=true; btn.textContent='⏳ Отправка...';
+
+  // 1) в Poster/сверку через webhook (тихо, в фоне)
+  fetch(WEBHOOK_URL,{
+    method:'POST',
+    // no-cors: ответ не читаем, но запрос уходит. Apps Script принимает.
+    mode:'no-cors',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(c.payload)
+  }).catch(function(){/* тихо */});
+
+  // 2) отчёт в WhatsApp
+  const msg=buildWA(c);
+  const url=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    ? 'whatsapp://send?text='+encodeURIComponent(msg)
+    : 'https://wa.me/?text='+encodeURIComponent(msg);
+
+  setTimeout(function(){
+    window.open(url,'_blank');
+    btn.disabled=false;
+    btn.innerHTML='✅ Отправлено';
+    toast('Отчёт отправлен. Учёт ушёл в Poster.');
+    setTimeout(function(){ sending=false; renderForm(role); }, 1500);
+  }, 400);
+}
+
+// ============ TABS / TOAST ============
+function switchRole(role){
+  activeRole=role;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.form').forEach(function(f){f.classList.remove('active');});
+  document.getElementById('tab-'+role).classList.add('active');
+  document.getElementById('form-'+role).classList.add('active');
+}
+function toast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(err?' error':'');
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+
+// ============ INIT ============
+renderForm('barista');
+renderForm('cook');
+</script>
+</body>
+</html>
