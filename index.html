@@ -867,8 +867,8 @@ function renderHome() {
         <h2>Закрытие смены</h2>
         <p>Остатки, производство, списания</p>
       </a>
-      ${data.sections.map(s => `
-        <button class="section-card" onclick="openSection('${s.id}')">
+      ${data.sections.filter(s => s.id !== 'shift').map(s => `
+      <button class="section-card" onclick="openSection('${s.id}')">
           <div class="section-icon">${s.icon}</div>
           <h2>${s.title}</h2>
           <p>${s.desc}</p>
