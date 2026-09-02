@@ -73,6 +73,18 @@ h1.page-title{font-size:20px;font-weight:800;color:var(--g);margin-bottom:4px;}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--g);color:var(--white);padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:300;transition:transform .3s;max-width:92%;text-align:center;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.error{background:var(--red);}
+
+.cl-note{font-size:11px;color:var(--mu);margin-bottom:8px;line-height:1.4;}
+.cl-cat{border-bottom:1px solid var(--dv);}
+.cl-head{width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;padding:11px 2px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:var(--g);cursor:pointer;}
+.cl-head .cl-cnt{font-size:11px;color:var(--y);background:var(--g);border-radius:10px;padding:1px 7px;margin-left:auto;margin-right:8px;display:none;}
+.cl-head .cl-cnt.on{display:inline-block;}
+.cl-arrow{color:var(--mu);font-size:12px;}
+.cl-body{padding:2px 0 8px;}
+.cl-row{display:flex;align-items:center;gap:9px;padding:7px 2px;cursor:pointer;}
+.cl-check{width:19px;height:19px;flex-shrink:0;accent-color:var(--g);cursor:pointer;}
+.cl-name{flex:1;font-size:13px;color:var(--text);}
+.cl-min{font-size:11px;color:var(--mu);flex-shrink:0;text-align:right;}
 </style>
 </head>
 <body>
@@ -226,6 +238,118 @@ const WRITEOFF_DISHES = [
   { name:'Детский сок', id:'82', type:'1' },
 ];
 
+
+// ============ ЧЕК-ЛИСТ ЗАКУПА ============
+const CHECKLIST = {
+  barista: [
+    { cat:'Основное', items:[
+      {n:'Кофе',m:'мин. 1 кг'},{n:'Молоко',m:'мин. 10 л'},{n:'Горячий шоколад',m:'мин. 1/3 ёмкости'},
+      {n:'Сливки',m:'мин. 500 мл'},{n:'Чай чёрный',m:'мин. 1/3 пачки'},{n:'Чай зелёный',m:'мин. 1/3 пачки'},
+      {n:'Каркаде листовой',m:'мин. 500 г'},{n:'Мороженое',m:'мин. 1 тара'},{n:'Лёд',m:'мин. 1 пачка'},
+      {n:'Сахар килограммовый',m:'мин. 1/3 кг'},
+    ]},
+    { cat:'Сиропы, пюре, топпинги', items:[
+      {n:'Пинч Карамель',m:'мин. 1/3 л'},{n:'Пинч Солёная карамель',m:'мин. 1/3 л'},{n:'Пинч Ваниль',m:'мин. 1/3 л'},
+      {n:'Пинч Лесной орех',m:'мин. 1/3 л'},{n:'Пинч Шоколад',m:'мин. 1/3 л'},{n:'Пинч Попкорн',m:'мин. 1/3 л'},
+      {n:'Пинч Кокос',m:'мин. 1/3 л'},{n:'Пинч Малина',m:'мин. 1/3 л'},{n:'Пинч Смородина',m:'мин. 1/3 л'},
+      {n:'Пинч Банан',m:'мин. 1/3 л'},{n:'Пинч Гранат',m:'мин. 1/3 л'},{n:'Пинч Манго',m:'мин. 1/3 л'},
+      {n:'Пинч Зелёное яблоко',m:'мин. 1/3 л'},{n:'Пинч Мохито',m:'мин. 1/3 л'},{n:'Пинч Сок лимона',m:'мин. 1/3 л'},
+      {n:'Пюре Клюква',m:'мин. 1/3 л'},{n:'Пюре Облепиха',m:'мин. 1/3 л'},{n:'Пюре Маракуйя с косточкой',m:'мин. 1/3 л'},
+      {n:'Пюре Киви',m:'мин. 1/3 л'},{n:'Пюре Вишня',m:'мин. 1/3 л'},{n:'Имбирь конфитюр',m:'мин. 1/3 л'},
+      {n:'Шоколад топпинг',m:'мин. 1/3 л'},{n:'Клубника топпинг',m:'мин. 1/3 л'},
+    ]},
+    { cat:'Фрукты и заморозка', items:[
+      {n:'Лимон',m:'мин. 1 шт'},{n:'Банан',m:'мин. 0,5 пучка'},{n:'Апельсин',m:'мин. 1 шт'},
+      {n:'Малина замороженная',m:'мин. 1/3 пачки'},
+    ]},
+    { cat:'Напитки', items:[
+      {n:'Апельсин Piko 1л',m:'мин. 1 л'},{n:'Вишнёвый сок',m:'мин. 1 л'},{n:'Тоник ЖБ',m:'мин. 2 шт'},
+      {n:'Вода 0,5',m:'мин. 1 упак.'},{n:'Кола',m:'мин. 1 упак.'},{n:'Фанта',m:'мин. 1 упак.'},
+      {n:'Fuse tea',m:'мин. 2 упак.'},{n:'Детский сок',m:'мин. 1 упак.'},{n:'Сарыагаш',m:'мин. 2 шт'},
+    ]},
+    { cat:'Одноразовая посуда', items:[
+      {n:'Стакан 0,3',m:'мин. 50 шт'},{n:'Стакан 0,4',m:'мин. 50 шт'},{n:'Стакан 0,2',m:'мин. 50 шт'},
+      {n:'Стакан 0,1 для эспрессо',m:'мин. 25 шт'},{n:'Одноразовый стакан 0,2',m:'мин. 25 шт'},{n:'Шейкер 400 мл',m:'мин. 50 шт'},
+      {n:'Крышки для холодного',m:'мин. 50 шт'},{n:'Крышки для горячего',m:'мин. 50 шт'},{n:'Бутылка 300 мл',m:'мин. 20 шт'},
+      {n:'Палочки',m:'мин. 1/3 пачки'},{n:'Подстаканник двойной',m:'мин. 20 шт'},{n:'Подстаканник четверной',m:'мин. 20 шт'},
+      {n:'Трубочки толстые',m:'мин. 1/3 пачки'},{n:'Кап холдер',m:'мин. 1 пачка'},{n:'Сахар в стиках',m:'мин. 1/3 коробки'},
+      {n:'Влажные салфетки',m:'мин. 1/3 коробки'},{n:'Обычные салфетки',m:'мин. 10 пачек'},
+    ]},
+    { cat:'Хоз товары', items:[
+      {n:'Гарбич 160 л',m:'мин. 1 рулон'},{n:'Тряпка для швабры',m:'мин. 1 шт'},{n:'Микрофибра',m:'мин. 1 пачка'},
+      {n:'Микрофибра для стекла',m:'мин. 1 шт'},{n:'Губки',m:'мин. 1 пачка'},{n:'Азелит',m:'мин. 1/3 л'},
+      {n:'Фэйри',m:'мин. 1/3 л'},{n:'Мистер Мускул',m:'мин. 1/3 л'},{n:'Средство для стёкол',m:'мин. 1/3 л'},
+      {n:'Порошок для кофемашины',m:'мин. 1/3 упак.'},{n:'Антисептик 1 л',m:'мин. 1/3 л'},
+    ]},
+    { cat:'Канц товары', items:[
+      {n:'Чековая бумага 80 мм',m:'мин. 1 пачка'},{n:'Маркеры',m:'мин. 1 шт'},{n:'Степлер / скобы',m:'мин. 1 пачка'},{n:'Ручки',m:'мин. 1 шт'},
+    ]},
+  ],
+  cook: [
+    { cat:'Мясо и хлеб', items:[
+      {n:'Сосиски говяжьи',m:'каждый день'},{n:'Сосиски куриные',m:'мин. 2 пачки'},
+      {n:'Булочки',m:'каждый день'},{n:'Булочки для френч',m:'мин. 40 шт'},
+    ]},
+    { cat:'Соусы', items:[
+      {n:'Кетчуп',m:'мин. 2 кг'},{n:'Барбекю',m:'мин. 1 кг'},{n:'Сырный',m:'мин. 1 кг'},
+      {n:'Сладкая горчица',m:'мин. 2 кг'},{n:'Табаска',m:'мин. 2 шт'},
+    ]},
+    { cat:'Добавки', items:[
+      {n:'Жареный лук',m:'мин. 0,5 кг'},{n:'Чипсы',m:'мин. 1 пачка'},{n:'Сыр ломтики Чеддер',m:'мин. 1/3 пачки'},
+      {n:'Халапеньо',m:'мин. 1/3 банки'},{n:'Огурцы маринованные',m:'мин. 1 банка'},
+    ]},
+    { cat:'Закуски', items:[
+      {n:'Фри',m:'мин. 3 пачки'},{n:'Наггетсы',m:'мин. 1 пачка'},
+    ]},
+    { cat:'Прочее', items:[
+      {n:'Масло для фри',m:'мин. 1/3 канистры'},{n:'Соль Экстра',m:'мин. 1/3 пачки'},{n:'Майонез',m:'мин. 1/3 пачки'},
+      {n:'Сметана',m:'мин. 1/3 пачки'},{n:'Чим чим',m:'мин. 1 шт'},
+    ]},
+    { cat:'Овощи', items:[
+      {n:'Помидор',m:'мин. 1 кг'},{n:'Белый лук',m:'мин. 0,5 кг'},{n:'Красный лук',m:'мин. 0,5 кг'},
+      {n:'Красная капуста',m:'мин. 1 кг'},{n:'Белая капуста',m:'мин. 1 кг'},{n:'Огурцы',m:'мин. 2 шт'},
+      {n:'Морковь',m:'мин. 0,5 кг'},{n:'Укроп',m:'мин. 1 пучок'},{n:'Кинза',m:'мин. 1 пучок'},
+    ]},
+    { cat:'Одноразовая посуда', items:[
+      {n:'Бокс с собой',m:'мин. 50 шт'},{n:'Обёртка',m:'мин. 1/3 пачки'},{n:'Пакет для френч',m:'мин. 50 шт'},
+      {n:'Пакет для фри',m:'мин. 50 шт'},{n:'Соусница',m:'мин. 50 шт'},{n:'Крафт пакеты',m:'мин. 50 шт'},
+      {n:'Маячка',m:'мин. 1 рулон'},{n:'Перчатки виниловые',m:'мин. 1 пачка'},{n:'Фольга',m:'мин. 1 рулон'},
+      {n:'Влажные салфетки',m:'мин. 1/3 коробки'},{n:'Обычные салфетки',m:'мин. 10 пачек'},
+    ]},
+  ],
+};
+
+function checklistHTML(role){
+  return CHECKLIST[role].map(function(cat,ci){
+    const cid = role+'-cat-'+ci;
+    const rows = cat.items.map(function(it){
+      return '<label class="cl-row"><input type="checkbox" class="cl-check" data-name="'+esc(it.n)+'" onchange="catCount(\''+cid+'\')">'+
+             '<span class="cl-name">'+esc(it.n)+'</span>'+
+             '<span class="cl-min">'+esc(it.m||'')+'</span></label>';
+    }).join('');
+    return '<div class="cl-cat">'+
+      '<button type="button" class="cl-head" onclick="toggleCat(\''+cid+'\')">'+
+        '<span>'+esc(cat.cat)+'</span>'+
+        '<span class="cl-cnt" id="cnt-'+cid+'"></span>'+
+        '<span class="cl-arrow" id="arr-'+cid+'">&#9656;</span>'+
+      '</button>'+
+      '<div class="cl-body" id="'+cid+'" style="display:none;">'+rows+'</div>'+
+    '</div>';
+  }).join('');
+}
+function toggleCat(id){
+  const b=document.getElementById(id); const a=document.getElementById('arr-'+id);
+  if(b.style.display==='none'){ b.style.display='block'; a.innerHTML='&#9662;'; }
+  else { b.style.display='none'; a.innerHTML='&#9656;'; }
+}
+function catCount(cid){
+  const body=document.getElementById(cid);
+  const n=body.querySelectorAll('.cl-check:checked').length;
+  const badge=document.getElementById('cnt-'+cid);
+  if(n>0){ badge.textContent=n; badge.classList.add('on'); }
+  else{ badge.textContent=''; badge.classList.remove('on'); }
+}
+
 let activeRole = 'barista';
 let sending = false;
 
@@ -285,9 +409,12 @@ function renderForm(role){
          '</div>'+
          '</div>';
   }
-  // закуп
-  h += '<div class="card"><div class="card-title">🛒 Закуп на завтра</div>'+
-       '<div id="'+role+'-zakup"><input class="wo-inp" type="text" placeholder="Что нужно купить..."></div>'+
+  // чек-лист закупа
+  h += '<div class="card"><div class="card-title">🛒 Чек-лист закупа</div>'+
+       '<p class="cl-note">Отметь, что нужно купить. «Мин. остаток» — порог, ниже которого позицию заказываем.</p>'+
+       checklistHTML(role)+
+       '<div class="group-label">Другое (вписать вручную)</div>'+
+       '<div id="'+role+'-zakup"><input class="wo-inp" type="text" placeholder="Что ещё купить..."></div>'+
        '<button class="add-btn" onclick="addZakup(\''+role+'\')">+ Добавить строку</button></div>';
   // кнопка
   h += '<button class="send-btn" id="'+role+'-send" onclick="submitReport(\''+role+'\')">'+
@@ -392,8 +519,9 @@ function collect(role){
       }
     });
   }
-  // закуп
+  // закуп: отмеченные в чек-листе + вписанные вручную
   const zakup=[];
+  document.querySelectorAll('#form-'+role+' .cl-check:checked').forEach(function(c){ zakup.push(c.getAttribute('data-name')); });
   document.querySelectorAll('#'+role+'-zakup input').forEach(function(i){ if(i.value.trim()) zakup.push(i.value.trim()); });
 
   return {
