@@ -862,6 +862,11 @@ function renderHome() {
       <p>Стандарты, рецепты и операционные процессы</p>
     </div>
     <div class="sections-grid">
+          <a class="section-card" href="zakrytie.html" style="text-decoration:none;">
+        <div class="section-icon">🌙</div>
+        <h2>Закрытие смены</h2>
+        <p>Остатки, производство, списания</p>
+      </a>
       ${data.sections.map(s => `
         <button class="section-card" onclick="openSection('${s.id}')">
           <div class="section-icon">${s.icon}</div>
