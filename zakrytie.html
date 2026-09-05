@@ -364,7 +364,7 @@ function remaindersHTML(role){
         const pid = it.pid ? ' data-pid="'+it.pid+'"' : '';
         return '<div class="row">'+
           '<span class="row-name">'+esc(it.name)+' '+badge+'</span>'+
-          '<input class="num-inp rem-inp" type="number" min="0" placeholder="0"'+pid+' data-name="'+esc(it.name)+'">'+
+          '<input class="num-inp rem-inp" type="number" min="0" placeholder="0" oninput="checkReady(\''+role+'\')"'+pid+' data-name="'+esc(it.name)+'">'+
           '<span class="unit">'+esc(it.unit)+'</span>'+
         '</div>';
       }).join('');
@@ -388,7 +388,7 @@ function renderForm(role){
   h += '<div class="card"><div class="card-title">🗓 Дата и время</div>'+
        '<div class="dt-row"><input class="dt-inp" type="date" id="'+role+'-date"><input class="dt-inp" type="time" id="'+role+'-time"></div></div>';
   h += '<div class="card"><div class="card-title">👤 Сотрудник</div>'+
-       '<div class="name-field"><span class="nf-label">Имя</span><input class="nf-inp" type="text" id="'+role+'-name" placeholder="Введите имя..."></div></div>';
+       '<div class="name-field"><span class="nf-label">Имя</span><input class="nf-inp" type="text" id="'+role+'-name" oninput="checkReady(\''+role+'\')" placeholder="Введите имя..."></div></div>';
   // остатки
   h += '<div class="card"><div class="card-title">📦 Остатки на конец смены</div>'+remaindersHTML(role)+'</div>';
   // производство
@@ -417,7 +417,7 @@ function renderForm(role){
        '<div id="'+role+'-zakup"><input class="wo-inp" type="text" placeholder="Что ещё купить..."></div>'+
        '<button class="add-btn" onclick="addZakup(\''+role+'\')">+ Добавить строку</button></div>';
   // кнопка
-  h += '<button class="send-btn" id="'+role+'-send" onclick="submitReport(\''+role+'\')">'+
+  h += '<button class="send-btn" id="'+role+'-send" disabled onclick="submitReport(\''+role+'\')">'+
        '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.098.544 4.07 1.496 5.789L.057 23.854c-.073.274.196.537.468.457l6.186-1.602A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.028-1.383l-.36-.214-3.732.966.999-3.626-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>'+
        'Отправить отчёт</button>';
 
@@ -431,6 +431,19 @@ function renderForm(role){
   document.getElementById(role+'-time').value=ts;
 
   if(isBar){ addWoRow(); }
+  checkReady(role);
+}
+
+// кнопка активна только если форма заполнена по-настоящему (имя + минимум 3 остатка)
+function checkReady(role){
+  const nameEl=document.getElementById(role+'-name');
+  if(!nameEl) return;
+  const name=nameEl.value.trim();
+  let filled=0;
+  document.querySelectorAll('#form-'+role+' .rem-inp').forEach(function(i){ if(i.value.trim()!=='') filled++; });
+  const btn=document.getElementById(role+'-send');
+  if(!btn) return;
+  btn.disabled = !(name!=='' && filled>=3);
 }
 
 // ============ СПИСАНИЕ: строки ============
@@ -582,7 +595,7 @@ function submitReport(role){
     window.open(url,'_blank');
     btn.disabled=false;
     btn.innerHTML='✅ Отправлено';
-    toast('Отчёт отправлен. Учёт ушёл в Poster.');
+    toast('Отчёт отправлен. Учёт проведётся в 22:00.');
     setTimeout(function(){ sending=false; renderForm(role); }, 1500);
   }, 400);
 }
