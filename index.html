@@ -214,13 +214,11 @@ main { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 <body>
 
 <header>
-  <div class="logo" onclick="goHome()">
+  <div class="logo" onclick="logoTap()">
     <div class="logo-bars"><span></span><span></span><span></span><span></span><span></span></div>
     <div class="logo-text">GOOD DOG <span>HQ</span></div>
   </div>
-  <div class="header-right">
-    <button class="btn-settings" onclick="openSettingsModal()">⚙️</button>
-  </div>
+  <div class="header-right"></div>
 </header>
 
 <main id="mainContent"></main>
@@ -347,7 +345,17 @@ function setData(data) {
 }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function getSetting(k, d='') { return localStorage.getItem(k) || d; }
-function getPassword() { return getSetting(PASS_KEY, 'Good2020'); }
+function getPassword() { return getSetting(PASS_KEY, 'Good'); }
+
+// тайный вход: 5 быстрых тапов по логотипу -> вход редактора/настройки
+let _logoTaps=0,_logoTimer=null;
+function logoTap(){
+  _logoTaps++;
+  clearTimeout(_logoTimer);
+  _logoTimer=setTimeout(function(){ _logoTaps=0; },1500);
+  if(_logoTaps>=5){ _logoTaps=0; if(isEditor){ openSettingsModal(); } else { openLoginModal(); } return; }
+  goHome();
+}
 
 // NAV
 function goHome() { currentSection = null; currentCard = null; renderHome(); }
@@ -493,7 +501,7 @@ function doLogin() {
   if (pass === getPassword()) {
     isEditor = true; closeModal('loginModal');
     if (currentSection) renderSection(); else renderHome();
-    showToast('Вы вошли как редактор');
+    showToast('Вы вошли как редактор'); openSettingsModal();
   } else { showToast('Неверный пароль', true); }
 }
 
