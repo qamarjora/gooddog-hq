@@ -88,6 +88,16 @@ h1.page-title{font-size:20px;font-weight:800;color:var(--g);margin-bottom:4px;}
 
 .wo-search{width:100%;font-size:13px;font-family:'Manrope',sans-serif;border:1px solid var(--bd);border-radius:10px;padding:9px 12px;background:var(--ibg);color:var(--text);outline:none;margin-bottom:10px;}
 .wo-search:focus{border-color:var(--g);}
+
+.wo-results{max-height:200px;overflow-y:auto;border:1px solid var(--bd);border-radius:10px;margin-bottom:10px;display:none;}
+.wo-results.show{display:block;}
+.wo-res{width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--dv);padding:11px 12px;font-family:'Manrope',sans-serif;font-size:13px;color:var(--text);cursor:pointer;}
+.wo-res:last-child{border-bottom:none;}
+.wo-res:active{background:var(--ibg);}
+.wo-chosen{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid var(--dv);}
+.wo-chosen:last-child{border-bottom:none;}
+.wo-cname{flex:1;font-size:13px;font-weight:500;color:var(--text);}
+.wo-empty{font-size:12px;color:var(--mu);padding:8px 2px;}
 </style>
 </head>
 <body>
@@ -400,9 +410,9 @@ function renderForm(role){
   // списание (только бариста)
   if(isBar){
     h += '<div class="card"><div class="card-title">🗑 Списание за смену</div>'+
-         '<input class="wo-search" type="text" placeholder="🔍 Поиск блюда..." oninput="filterWo(this.value)">'+
-         '<div id="wo-list"></div>'+
-         '<button class="add-btn" onclick="addWoRow()">+ Добавить позицию</button>'+
+         '<input class="wo-search" id="wo-search" type="text" placeholder="🔍 Начни писать блюдо..." oninput="woSearch(this.value)" onfocus="woSearch(this.value)">'+
+         '<div class="wo-results" id="wo-results"></div>'+
+         '<div id="wo-list"><div class="wo-empty">Пока ничего не выбрано. Найди блюдо выше и нажми.</div></div>'+
          '<div class="sausage-box">'+
            '<div class="sausage-title">🌭 Сосиски (для списанных хот-догов)</div>'+
            SAUSAGES.map(function(s){
@@ -428,7 +438,6 @@ function renderForm(role){
 
   document.getElementById('form-'+role).innerHTML = h;
 
-  if(isBar){ addWoRow(); }
   checkReady(role);
 }
 
@@ -444,54 +453,58 @@ function checkReady(role){
   btn.disabled = !(name!=='' && filled>=3);
 }
 
-// ============ СПИСАНИЕ: строки ============
-function woOptions(){
-  return '<option value="">— выбрать блюдо —</option>'+
-    WRITEOFF_DISHES.map(function(dd,idx){
-      return '<option value="'+idx+'">'+esc(dd.name)+'</option>';
-    }).join('');
-}
-
-// поиск по списку блюд в списании
-function filterWo(q){
+// ============ СПИСАНИЕ: поиск и выбор ============
+function woSearch(q){
+  const box=document.getElementById('wo-results'); if(!box) return;
   q=(q||'').toLowerCase().trim();
-  document.querySelectorAll('#wo-list .wo-sel').forEach(function(sel){
-    Array.prototype.forEach.call(sel.options,function(o){
-      if(o.value===''){ o.hidden=false; return; }
-      const dd=WRITEOFF_DISHES[parseInt(o.value,10)];
-      o.hidden = q!=='' && dd && dd.name.toLowerCase().indexOf(q)===-1;
-    });
-  });
+  if(q===''){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const chosen=getChosenIdx();
+  const hits=[];
+  for(let i=0;i<WRITEOFF_DISHES.length && hits.length<10;i++){
+    if(chosen.indexOf(i)!==-1) continue;
+    if(WRITEOFF_DISHES[i].name.toLowerCase().indexOf(q)!==-1) hits.push(i);
+  }
+  if(!hits.length){ box.classList.add('show'); box.innerHTML='<div class="wo-empty" style="padding:11px 12px;">Ничего не найдено</div>'; return; }
+  box.innerHTML=hits.map(function(i){ return '<button type="button" class="wo-res" onclick="woAdd('+i+')">'+esc(WRITEOFF_DISHES[i].name)+'</button>'; }).join('');
+  box.classList.add('show');
 }
-
-function addWoRow(){
-  const list=document.getElementById('wo-list');
-  if(!list) return;
+function getChosenIdx(){
+  const arr=[]; document.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){ arr.push(parseInt(r.getAttribute('data-idx'),10)); }); return arr;
+}
+function woAdd(idx){
+  const list=document.getElementById('wo-list'); if(!list) return;
+  const empty=list.querySelector('.wo-empty'); if(empty) empty.remove();
+  const dd=WRITEOFF_DISHES[idx];
   const div=document.createElement('div');
-  div.className='wo-row';
-  div.innerHTML='<select class="wo-sel" onchange="updateSausageHint()">'+woOptions()+'</select>'+
-    '<input class="wo-num" type="number" min="0" placeholder="0" oninput="updateSausageHint()">'+
-    '<button class="wo-del" onclick="this.parentElement.remove();updateSausageHint()">×</button>';
+  div.className='wo-chosen'; div.setAttribute('data-idx',idx);
+  div.innerHTML='<span class="wo-cname">'+esc(dd.name)+'</span>'+
+    '<input class="wo-num" type="number" min="1" value="1" oninput="updateSausageHint()">'+
+    '<button class="wo-del" onclick="woRemove(this)">×</button>';
   list.appendChild(div);
+  const inp=document.getElementById('wo-search'); if(inp) inp.value='';
+  const box=document.getElementById('wo-results'); if(box){ box.classList.remove('show'); box.innerHTML=''; }
+  updateSausageHint();
+}
+function woRemove(btn){
+  const list=document.getElementById('wo-list');
+  btn.parentElement.remove();
+  if(!list.querySelector('.wo-chosen')) list.innerHTML='<div class="wo-empty">Пока ничего не выбрано. Найди блюдо выше и нажми.</div>';
+  updateSausageHint();
 }
 function countHotdogs(){
   let n=0;
-  document.querySelectorAll('#wo-list .wo-row').forEach(function(r){
-    const sel=r.querySelector('.wo-sel'); const num=r.querySelector('.wo-num');
-    if(sel.value===''||!num.value) return;
-    const dd=WRITEOFF_DISHES[parseInt(sel.value,10)];
-    if(dd && dd.hd) n += parseInt(num.value,10)||0;
+  document.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){
+    const dd=WRITEOFF_DISHES[parseInt(r.getAttribute('data-idx'),10)];
+    const num=parseInt(r.querySelector('.wo-num').value,10)||0;
+    if(dd && dd.hd) n+=num;
   });
   return n;
 }
 function countSausages(){
-  let n=0;
-  document.querySelectorAll('.saus-inp').forEach(function(i){ n += parseInt(i.value,10)||0; });
-  return n;
+  let n=0; document.querySelectorAll('.saus-inp').forEach(function(i){ n+=parseInt(i.value,10)||0; }); return n;
 }
 function updateSausageHint(){
-  const hint=document.getElementById('saus-hint');
-  if(!hint) return;
+  const hint=document.getElementById('saus-hint'); if(!hint) return;
   const hd=countHotdogs(), s=countSausages();
   if(hd===0 && s===0){ hint.textContent=''; hint.className='hint'; return; }
   if(hd===s){ hint.textContent='✅ Сосиски сходятся с хот-догами ('+hd+')'; hint.className='hint'; }
@@ -529,10 +542,10 @@ function collect(role){
   // списание (только бариста)
   const writeoff=[]; const woReport=[];
   if(role==='barista'){
-    document.querySelectorAll('#wo-list .wo-row').forEach(function(r){
-      const sel=r.querySelector('.wo-sel'); const num=parseInt(r.querySelector('.wo-num').value,10)||0;
-      if(sel.value===''||num<=0) return;
-      const dd=WRITEOFF_DISHES[parseInt(sel.value,10)];
+    document.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){
+      const num=parseInt(r.querySelector('.wo-num').value,10)||0;
+      if(num<=0) return;
+      const dd=WRITEOFF_DISHES[parseInt(r.getAttribute('data-idx'),10)];
       writeoff.push({id:dd.id,type:dd.type,num:num});
       woReport.push({name:dd.name,num:num});
     });
