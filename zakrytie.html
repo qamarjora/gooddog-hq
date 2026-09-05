@@ -85,6 +85,9 @@ h1.page-title{font-size:20px;font-weight:800;color:var(--g);margin-bottom:4px;}
 .cl-check{width:19px;height:19px;flex-shrink:0;accent-color:var(--g);cursor:pointer;}
 .cl-name{flex:1;font-size:13px;color:var(--text);}
 .cl-min{font-size:11px;color:var(--mu);flex-shrink:0;text-align:right;}
+
+.wo-search{width:100%;font-size:13px;font-family:'Manrope',sans-serif;border:1px solid var(--bd);border-radius:10px;padding:9px 12px;background:var(--ibg);color:var(--text);outline:none;margin-bottom:10px;}
+.wo-search:focus{border-color:var(--g);}
 </style>
 </head>
 <body>
@@ -98,7 +101,7 @@ h1.page-title{font-size:20px;font-weight:800;color:var(--g);margin-bottom:4px;}
 
 <main>
   <h1 class="page-title">🌙 Закрытие смены</h1>
-  <p class="subtitle">Остатки, производство и списания. Одна кнопка — отчёт в WhatsApp и учёт в Poster.</p>
+  <p class="subtitle">⚠️ Пиши остатки честно и точно — по ним ведётся учёт и контроль. Это важная часть работы: ошибка в цифрах = неверный учёт по всему кафе.</p>
 
   <div class="tabs">
     <button class="tab active" id="tab-barista" onclick="switchRole('barista')">☕ Бариста</button>
@@ -147,6 +150,7 @@ const REMAINDERS = {
       { name:'Фри', unit:'пач' },
       { name:'Жареный лук', unit:'кг' },
       { name:'Наггетсы', unit:'пач' },
+      { name:'Чипсы', unit:'пач' },
     ]},
     { group:'Соусы', items:[
       { name:'Кетчуп', unit:'кг' },
@@ -160,12 +164,12 @@ const REMAINDERS = {
 // Производство за смену (штучно). type: 1=полуфабрикат, 2=тех.карта
 const PRODUCTION = {
   barista: [
-    { name:'Каркаде Вишня', id:'79', type:'2' },
+    { name:'Каркаде Вишня', id:'79', type:'2', unit:'шт' },
   ],
   cook: [
-    { name:'Коул слоу', id:'29', type:'1' },
-    { name:'Морковный', id:'30', type:'1' },
-    { name:'Сальса',   id:'27', type:'1' },
+    { name:'Коул слоу', id:'29', type:'1', unit:'порция' },
+    { name:'Морковный', id:'30', type:'1', unit:'порция' },
+    { name:'Сальса',   id:'27', type:'1', unit:'порция' },
   ],
 };
 
@@ -202,6 +206,7 @@ const WRITEOFF_DISHES = [
   { name:'Раф 450', id:'86', type:'2' },
   { name:'Раф Цитрус 450', id:'106', type:'2' },
   { name:'Флейт Уайт 250', id:'54', type:'2' },
+  { name:'Горячий шоколад', id:'80', type:'2' },
   { name:'Эспрессо 1 шот', id:'58', type:'2' },
   { name:'Эспрессо 2 шот', id:'59', type:'2' },
   // Холодное кофе
@@ -234,6 +239,7 @@ const WRITEOFF_DISHES = [
   { name:'Фри', id:'20', type:'2' },
   { name:'Наггетсы', id:'21', type:'2' },
   // Товары
+  { name:'Напитки (кола, фанта…)', id:'111', type:'1' },
   { name:'Вода', id:'17', type:'1' },
   { name:'Детский сок', id:'82', type:'1' },
 ];
@@ -245,7 +251,7 @@ const CHECKLIST = {
     { cat:'Основное', items:[
       {n:'Кофе',m:'мин. 1 кг'},{n:'Молоко',m:'мин. 10 л'},{n:'Горячий шоколад',m:'мин. 1/3 ёмкости'},
       {n:'Сливки',m:'мин. 500 мл'},{n:'Чай чёрный',m:'мин. 1/3 пачки'},{n:'Чай зелёный',m:'мин. 1/3 пачки'},
-      {n:'Каркаде листовой',m:'мин. 500 г'},{n:'Мороженое',m:'мин. 1 тара'},{n:'Лёд',m:'мин. 1 пачка'},
+      {n:'Каркаде листовой',m:'мин. 200 г'},{n:'Мороженое',m:'мин. 1 тара'},{n:'Лёд',m:'мин. 0,5 пачки'},
       {n:'Сахар килограммовый',m:'мин. 1/3 кг'},
     ]},
     { cat:'Сиропы, пюре, топпинги', items:[
@@ -288,15 +294,15 @@ const CHECKLIST = {
   cook: [
     { cat:'Мясо и хлеб', items:[
       {n:'Сосиски говяжьи',m:'каждый день'},{n:'Сосиски куриные',m:'мин. 2 пачки'},
-      {n:'Булочки',m:'каждый день'},{n:'Булочки для френч',m:'мин. 40 шт'},
+      {n:'Булочки',m:'каждый день'},{n:'Булочки для френч',m:'мин. 20 шт'},
     ]},
     { cat:'Соусы', items:[
-      {n:'Кетчуп',m:'мин. 2 кг'},{n:'Барбекю',m:'мин. 1 кг'},{n:'Сырный',m:'мин. 1 кг'},
-      {n:'Сладкая горчица',m:'мин. 2 кг'},{n:'Табаска',m:'мин. 2 шт'},
+      {n:'Кетчуп',m:'мин. 1 кг'},{n:'Барбекю',m:'мин. 1 кг'},{n:'Сырный',m:'мин. 1 кг'},
+      {n:'Сладкая горчица',m:'мин. 1 кг'},{n:'Табаска',m:'мин. 2 шт'},
     ]},
     { cat:'Добавки', items:[
       {n:'Жареный лук',m:'мин. 0,5 кг'},{n:'Чипсы',m:'мин. 1 пачка'},{n:'Сыр ломтики Чеддер',m:'мин. 1/3 пачки'},
-      {n:'Халапеньо',m:'мин. 1/3 банки'},{n:'Огурцы маринованные',m:'мин. 1 банка'},
+      {n:'Халапеньо',m:'мин. 1/3 банки'},{n:'Огурцы маринованные',m:'мин. 0,5 банки'},
     ]},
     { cat:'Закуски', items:[
       {n:'Фри',m:'мин. 3 пачки'},{n:'Наггетсы',m:'мин. 1 пачка'},
@@ -375,8 +381,8 @@ function productionHTML(role){
   return PRODUCTION[role].map(function(p){
     return '<div class="row">'+
       '<span class="row-name">'+esc(p.name)+'</span>'+
-      '<input class="num-inp prod-inp" type="number" min="0" placeholder="0" data-id="'+p.id+'" data-type="'+p.type+'" data-name="'+esc(p.name)+'">'+
-      '<span class="unit">шт</span>'+
+      '<input class="num-inp prod-inp" type="number" min="0" placeholder="0" data-id="'+p.id+'" data-type="'+p.type+'" data-name="'+esc(p.name)+'" data-unit="'+esc(p.unit||'шт')+'">'+
+      '<span class="unit">'+esc(p.unit||'шт')+'</span>'+
     '</div>';
   }).join('');
 }
@@ -384,9 +390,7 @@ function productionHTML(role){
 function renderForm(role){
   const isBar = role==='barista';
   let h = '';
-  // дата/имя
-  h += '<div class="card"><div class="card-title">🗓 Дата и время</div>'+
-       '<div class="dt-row"><input class="dt-inp" type="date" id="'+role+'-date"><input class="dt-inp" type="time" id="'+role+'-time"></div></div>';
+  // сотрудник
   h += '<div class="card"><div class="card-title">👤 Сотрудник</div>'+
        '<div class="name-field"><span class="nf-label">Имя</span><input class="nf-inp" type="text" id="'+role+'-name" oninput="checkReady(\''+role+'\')" placeholder="Введите имя..."></div></div>';
   // остатки
@@ -396,6 +400,7 @@ function renderForm(role){
   // списание (только бариста)
   if(isBar){
     h += '<div class="card"><div class="card-title">🗑 Списание за смену</div>'+
+         '<input class="wo-search" type="text" placeholder="🔍 Поиск блюда..." oninput="filterWo(this.value)">'+
          '<div id="wo-list"></div>'+
          '<button class="add-btn" onclick="addWoRow()">+ Добавить позицию</button>'+
          '<div class="sausage-box">'+
@@ -423,13 +428,6 @@ function renderForm(role){
 
   document.getElementById('form-'+role).innerHTML = h;
 
-  // дата/время по умолчанию
-  const d=new Date();
-  const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  const ts=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-  document.getElementById(role+'-date').value=ds;
-  document.getElementById(role+'-time').value=ts;
-
   if(isBar){ addWoRow(); }
   checkReady(role);
 }
@@ -453,6 +451,19 @@ function woOptions(){
       return '<option value="'+idx+'">'+esc(dd.name)+'</option>';
     }).join('');
 }
+
+// поиск по списку блюд в списании
+function filterWo(q){
+  q=(q||'').toLowerCase().trim();
+  document.querySelectorAll('#wo-list .wo-sel').forEach(function(sel){
+    Array.prototype.forEach.call(sel.options,function(o){
+      if(o.value===''){ o.hidden=false; return; }
+      const dd=WRITEOFF_DISHES[parseInt(o.value,10)];
+      o.hidden = q!=='' && dd && dd.name.toLowerCase().indexOf(q)===-1;
+    });
+  });
+}
+
 function addWoRow(){
   const list=document.getElementById('wo-list');
   if(!list) return;
@@ -501,7 +512,8 @@ function collect(role){
   const remainders=[]; const fact={};
   document.querySelectorAll('#form-'+role+' .rem-inp').forEach(function(i){
     const name=i.getAttribute('data-name'); const val=i.value.trim();
-    remainders.push({name:name, val:(val===''?'—':val)});
+    const unit=i.nextElementSibling && i.nextElementSibling.classList.contains('unit') ? i.nextElementSibling.textContent : '';
+    remainders.push({name:name, val:(val===''?'—':val), unit:unit});
     const pid=i.getAttribute('data-pid');
     if(pid && val!==''){ fact[pid]=parseFloat(val); }
   });
@@ -511,7 +523,7 @@ function collect(role){
     const num=parseInt(i.value,10)||0;
     if(num>0){
       manufacture.push({id:i.getAttribute('data-id'),type:i.getAttribute('data-type'),num:num});
-      prodReport.push({name:i.getAttribute('data-name'),num:num});
+      prodReport.push({name:i.getAttribute('data-name'),num:num,unit:(i.getAttribute('data-unit')||'шт')});
     }
   });
   // списание (только бариста)
@@ -540,8 +552,6 @@ function collect(role){
   return {
     role:role,
     name:(document.getElementById(role+'-name').value.trim()||'—'),
-    date:document.getElementById(role+'-date').value,
-    time:document.getElementById(role+'-time').value||'—',
     remainders:remainders, prodReport:prodReport, woReport:woReport, zakup:zakup,
     payload:{ role:role, manufacture:manufacture, writeoff:writeoff, fact:fact,
       names:{
@@ -557,10 +567,10 @@ function fmtDate(v){ if(!v) return '—'; const p=v.split('-'); return p[2]+'.'+
 function buildWA(c){
   const SEP='━━━━━━━━━━━━━━━';
   const head=c.role==='barista'?'☕ *ОТЧЁТ БАРИСТЫ — GOOD DOG*':'🌭 *ОТЧЁТ ПОВАРА — GOOD DOG*';
-  let m=head+'\n👤 '+c.name+'\n📅 '+fmtDate(c.date)+' | ⏰ '+c.time+'\n'+SEP+'\n';
+  let m=head+'\n👤 '+c.name+'\n'+SEP+'\n';
   m+='📦 *ОСТАТКИ НА КОНЕЦ СМЕНЫ*\n';
-  c.remainders.forEach(function(r){ m+='▸ '+r.name+': '+r.val+'\n'; });
-  if(c.prodReport.length){ m+=SEP+'\n'+(c.role==='barista'?'🍵':'🥗')+' *ПРОИЗВОДСТВО*\n'; c.prodReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+' шт\n'; }); }
+  c.remainders.forEach(function(r){ m+='▸ '+r.name+': '+r.val+(r.unit?(' '+r.unit):'')+'\n'; });
+  if(c.prodReport.length){ m+=SEP+'\n'+(c.role==='barista'?'🍵':'🥗')+' *ПРОИЗВОДСТВО*\n'; c.prodReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+' '+(r.unit||'шт')+'\n'; }); }
   if(c.woReport.length){ m+=SEP+'\n🗑 *СПИСАНИЯ*\n'; c.woReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+'\n'; }); }
   if(c.zakup.length){ m+=SEP+'\n🛒 *ЗАКУП НА ЗАВТРА*\n'; c.zakup.forEach(function(z){ m+='▸ '+z+'\n'; }); }
   return m;
