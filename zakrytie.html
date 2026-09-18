@@ -252,6 +252,10 @@ const WRITEOFF_DISHES = [
   { name:'Напитки (кола, фанта…)', id:'111', type:'1' },
   { name:'Вода', id:'17', type:'1' },
   { name:'Детский сок', id:'82', type:'1' },
+  // Ингредиенты (списываются напрямую)
+  { name:'Булочки (поштучно)', id:'33', type:'4', unit:'шт' },
+  { name:'Булочки Френч (поштучно)', id:'46', type:'4', unit:'шт' },
+  { name:'Кофе', id:'74', type:'4', unit:'кг' },
 ];
 
 
@@ -339,7 +343,7 @@ function checklistHTML(role){
   return CHECKLIST[role].map(function(cat,ci){
     const cid = role+'-cat-'+ci;
     const rows = cat.items.map(function(it){
-      return '<label class="cl-row"><input type="checkbox" class="cl-check" data-name="'+esc(it.n)+'" onchange="catCount(\''+cid+'\')">'+
+      return '<label class="cl-row"><input type="checkbox" class="cl-check" data-name="'+esc(it.n)+'" onchange="catCount(\''+cid+'\');saveDraft(activeRole)">'+
              '<span class="cl-name">'+esc(it.n)+'</span>'+
              '<span class="cl-min">'+esc(it.m||'')+'</span></label>';
     }).join('');
@@ -369,6 +373,11 @@ function catCount(cid){
 let activeRole = 'barista';
 let sending = false;
 
+function todayDMY(){
+  const d=new Date();
+  return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
+}
+
 // ============ РЕНДЕР ============
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -380,7 +389,7 @@ function remaindersHTML(role){
         const pid = it.pid ? ' data-pid="'+it.pid+'"' : '';
         return '<div class="row">'+
           '<span class="row-name">'+esc(it.name)+' '+badge+'</span>'+
-          '<input class="num-inp rem-inp" type="number" min="0" placeholder="0" oninput="checkReady(\''+role+'\')"'+pid+' data-name="'+esc(it.name)+'">'+
+          '<input class="num-inp rem-inp" type="number" min="0" placeholder="0" oninput="onFormInput(\''+role+'\')"'+pid+' data-name="'+esc(it.name)+'">'+
           '<span class="unit">'+esc(it.unit)+'</span>'+
         '</div>';
       }).join('');
@@ -391,7 +400,7 @@ function productionHTML(role){
   return PRODUCTION[role].map(function(p){
     return '<div class="row">'+
       '<span class="row-name">'+esc(p.name)+'</span>'+
-      '<input class="num-inp prod-inp" type="number" min="0" placeholder="0" data-id="'+p.id+'" data-type="'+p.type+'" data-name="'+esc(p.name)+'" data-unit="'+esc(p.unit||'шт')+'">'+
+      '<input class="num-inp prod-inp" type="number" min="0" placeholder="0" data-id="'+p.id+'" data-type="'+p.type+'" oninput="onFormInput(\''+role+'\')" data-name="'+esc(p.name)+'" data-unit="'+esc(p.unit||'шт')+'">'+
       '<span class="unit">'+esc(p.unit||'шт')+'</span>'+
     '</div>';
   }).join('');
@@ -400,9 +409,11 @@ function productionHTML(role){
 function renderForm(role){
   const isBar = role==='barista';
   let h = '';
-  // сотрудник
+  // дата (автоматически сегодня) + сотрудник
+  h += '<div class="card"><div class="card-title">🗓 Дата</div>'+
+       '<div class="name-field"><span class="nf-label">Сегодня</span><input class="nf-inp" type="text" id="'+role+'-date" readonly value="'+todayDMY()+'"></div></div>';
   h += '<div class="card"><div class="card-title">👤 Сотрудник</div>'+
-       '<div class="name-field"><span class="nf-label">Имя</span><input class="nf-inp" type="text" id="'+role+'-name" oninput="checkReady(\''+role+'\')" placeholder="Введите имя..."></div></div>';
+       '<div class="name-field"><span class="nf-label">Имя</span><input class="nf-inp" type="text" id="'+role+'-name" oninput="onFormInput(\''+role+'\')" placeholder="Введите имя..."></div></div>';
   // остатки
   h += '<div class="card"><div class="card-title">📦 Остатки на конец смены</div>'+remaindersHTML(role)+'</div>';
   // производство
@@ -417,7 +428,7 @@ function renderForm(role){
            '<div class="sausage-title">🌭 Сосиски (для списанных хот-догов)</div>'+
            SAUSAGES.map(function(s){
              return '<div class="row"><span class="row-name">'+esc(s.name)+' сосиска</span>'+
-               '<input class="num-inp saus-inp" type="number" min="0" placeholder="0" data-id="'+s.id+'" data-name="'+esc(s.name)+'" oninput="updateSausageHint()">'+
+               '<input class="num-inp saus-inp" type="number" min="0" placeholder="0" data-id="'+s.id+'" data-name="'+esc(s.name)+'" oninput="updateSausageHint();saveDraft(activeRole)">'+
                '<span class="unit">шт</span></div>';
            }).join('')+
            '<div class="hint" id="saus-hint"></div>'+
@@ -429,7 +440,7 @@ function renderForm(role){
        '<p class="cl-note">Отметь, что нужно купить. «Мин. остаток» — порог, ниже которого позицию заказываем.</p>'+
        checklistHTML(role)+
        '<div class="group-label">Другое (вписать вручную)</div>'+
-       '<div id="'+role+'-zakup"><input class="wo-inp" type="text" placeholder="Что ещё купить..."></div>'+
+       '<div id="'+role+'-zakup"><input class="wo-inp" type="text" placeholder="Что ещё купить..." oninput="saveDraft(\''+role+'\')"></div>'+
        '<button class="add-btn" onclick="addZakup(\''+role+'\')">+ Добавить строку</button></div>';
   // кнопка
   h += '<button class="send-btn" id="'+role+'-send" disabled onclick="submitReport(\''+role+'\')">'+
@@ -438,6 +449,7 @@ function renderForm(role){
 
   document.getElementById('form-'+role).innerHTML = h;
 
+  restoreDraft(role);
   checkReady(role);
 }
 
@@ -477,19 +489,22 @@ function woAdd(idx){
   const dd=WRITEOFF_DISHES[idx];
   const div=document.createElement('div');
   div.className='wo-chosen'; div.setAttribute('data-idx',idx);
+  const unit = dd.unit || 'шт';
+  const step = (unit==='кг' || unit==='л') ? '0.1' : '1';
   div.innerHTML='<span class="wo-cname">'+esc(dd.name)+'</span>'+
-    '<input class="wo-num" type="number" min="1" value="1" oninput="updateSausageHint()">'+
+    '<input class="wo-num" type="number" min="0" step="'+step+'" value="1" oninput="updateSausageHint();saveDraft(activeRole)">'+
+    '<span class="unit">'+esc(unit)+'</span>'+
     '<button class="wo-del" onclick="woRemove(this)">×</button>';
   list.appendChild(div);
   const inp=document.getElementById('wo-search'); if(inp) inp.value='';
   const box=document.getElementById('wo-results'); if(box){ box.classList.remove('show'); box.innerHTML=''; }
-  updateSausageHint();
+  updateSausageHint(); saveDraft(activeRole);
 }
 function woRemove(btn){
   const list=document.getElementById('wo-list');
   btn.parentElement.remove();
   if(!list.querySelector('.wo-chosen')) list.innerHTML='<div class="wo-empty">Пока ничего не выбрано. Найди блюдо выше и нажми.</div>';
-  updateSausageHint();
+  updateSausageHint(); saveDraft(activeRole);
 }
 function countHotdogs(){
   let n=0;
@@ -515,8 +530,9 @@ function updateSausageHint(){
 function addZakup(role){
   const list=document.getElementById(role+'-zakup');
   const i=document.createElement('input');
-  i.className='wo-inp'; i.type='text'; i.placeholder='Что нужно купить...';
-  list.appendChild(i); i.focus();
+  i.className='wo-inp'; i.type='text'; i.placeholder='Что ещё купить...';
+  i.setAttribute('oninput','saveDraft(\''+role+'\')');
+  list.appendChild(i); i.focus(); saveDraft(role);
 }
 
 // ============ СБОР ДАННЫХ ============
@@ -543,11 +559,11 @@ function collect(role){
   const writeoff=[]; const woReport=[];
   if(role==='barista'){
     document.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){
-      const num=parseInt(r.querySelector('.wo-num').value,10)||0;
+      const num=parseFloat(r.querySelector('.wo-num').value)||0;
       if(num<=0) return;
       const dd=WRITEOFF_DISHES[parseInt(r.getAttribute('data-idx'),10)];
       writeoff.push({id:dd.id,type:dd.type,num:num});
-      woReport.push({name:dd.name,num:num});
+      woReport.push({name:dd.name,num:num,unit:(dd.unit||'')});
     });
     document.querySelectorAll('.saus-inp').forEach(function(i){
       const num=parseInt(i.value,10)||0;
@@ -562,9 +578,11 @@ function collect(role){
   document.querySelectorAll('#form-'+role+' .cl-check:checked').forEach(function(c){ zakup.push(c.getAttribute('data-name')); });
   document.querySelectorAll('#'+role+'-zakup input').forEach(function(i){ if(i.value.trim()) zakup.push(i.value.trim()); });
 
+  const dateEl=document.getElementById(role+'-date');
   return {
     role:role,
     name:(document.getElementById(role+'-name').value.trim()||'—'),
+    date:(dateEl?dateEl.value:todayDMY()),
     remainders:remainders, prodReport:prodReport, woReport:woReport, zakup:zakup,
     payload:{ role:role, manufacture:manufacture, writeoff:writeoff, fact:fact,
       names:{
@@ -575,16 +593,84 @@ function collect(role){
   };
 }
 
+
+// ============ ЧЕРНОВИК (автосохранение до отправки) ============
+function draftKey(role){ return 'gd_draft_'+role; }
+
+// собрать всё введённое в компактный объект
+function readDraft(role){
+  const form=document.getElementById('form-'+role); if(!form) return null;
+  const d={ name:'', rem:{}, prod:{}, saus:{}, wo:[], check:[], zakup:[] };
+  const nameEl=document.getElementById(role+'-name'); if(nameEl) d.name=nameEl.value;
+  form.querySelectorAll('.rem-inp').forEach(function(i){ if(i.value!=='') d.rem[i.getAttribute('data-name')]=i.value; });
+  form.querySelectorAll('.prod-inp').forEach(function(i){ if(i.value!=='') d.prod[i.getAttribute('data-name')]=i.value; });
+  form.querySelectorAll('.saus-inp').forEach(function(i){ if(i.value!=='') d.saus[i.getAttribute('data-name')]=i.value; });
+  form.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){ d.wo.push({idx:r.getAttribute('data-idx'), num:r.querySelector('.wo-num').value}); });
+  form.querySelectorAll('.cl-check:checked').forEach(function(c){ d.check.push(c.getAttribute('data-name')); });
+  form.querySelectorAll('#'+role+'-zakup input').forEach(function(i){ if(i.value.trim()) d.zakup.push(i.value); });
+  return d;
+}
+function saveDraft(role){
+  try{ localStorage.setItem(draftKey(role), JSON.stringify(readDraft(role))); }catch(e){}
+}
+function clearDraft(role){
+  try{ localStorage.removeItem(draftKey(role)); }catch(e){}
+}
+// вызывается из oninput всех полей
+function onFormInput(role){ checkReady(role); saveDraft(role); }
+
+// восстановить черновик в отрисованную форму
+function restoreDraft(role){
+  let raw; try{ raw=localStorage.getItem(draftKey(role)); }catch(e){ raw=null; }
+  if(!raw) return;
+  let d; try{ d=JSON.parse(raw); }catch(e){ return; }
+  const form=document.getElementById('form-'+role); if(!form) return;
+  const nameEl=document.getElementById(role+'-name'); if(nameEl && d.name) nameEl.value=d.name;
+  form.querySelectorAll('.rem-inp').forEach(function(i){ const k=i.getAttribute('data-name'); if(d.rem&&d.rem[k]!==undefined) i.value=d.rem[k]; });
+  form.querySelectorAll('.prod-inp').forEach(function(i){ const k=i.getAttribute('data-name'); if(d.prod&&d.prod[k]!==undefined) i.value=d.prod[k]; });
+  form.querySelectorAll('.saus-inp').forEach(function(i){ const k=i.getAttribute('data-name'); if(d.saus&&d.saus[k]!==undefined) i.value=d.saus[k]; });
+  // списание
+  if(d.wo && d.wo.length){
+    d.wo.forEach(function(item){
+      woAdd(parseInt(item.idx,10));
+      const rows=form.querySelectorAll('#wo-list .wo-chosen');
+      const last=rows[rows.length-1];
+      if(last){ last.querySelector('.wo-num').value=item.num; }
+    });
+  }
+  // чек-лист
+  if(d.check && d.check.length){
+    form.querySelectorAll('.cl-check').forEach(function(c){
+      if(d.check.indexOf(c.getAttribute('data-name'))!==-1){ c.checked=true; }
+    });
+    // обновить счётчики категорий
+    form.querySelectorAll('.cl-body').forEach(function(b){ if(b.id) catCount(b.id); });
+  }
+  // закуп (другое)
+  if(d.zakup && d.zakup.length){
+    const list=document.getElementById(role+'-zakup');
+    if(list){
+      list.querySelectorAll('input').forEach(function(i){ i.remove(); });
+      d.zakup.forEach(function(v){
+        const i=document.createElement('input'); i.className='wo-inp'; i.type='text'; i.placeholder='Что ещё купить...'; i.value=v;
+        list.appendChild(i);
+      });
+    }
+  }
+  updateSausageHint();
+  checkReady(role);
+}
+
 // ============ WhatsApp текст ============
 function fmtDate(v){ if(!v) return '—'; const p=v.split('-'); return p[2]+'.'+p[1]+'.'+p[0]; }
 function buildWA(c){
   const SEP='━━━━━━━━━━━━━━━';
   const head=c.role==='barista'?'☕ *ОТЧЁТ БАРИСТЫ — GOOD DOG*':'🌭 *ОТЧЁТ ПОВАРА — GOOD DOG*';
-  let m=head+'\n👤 '+c.name+'\n'+SEP+'\n';
+  let m=head+'\n👤 '+c.name+'\n📅 '+(c.date||todayDMY())+'\n'+SEP+'\n';
   m+='📦 *ОСТАТКИ НА КОНЕЦ СМЕНЫ*\n';
   c.remainders.forEach(function(r){ m+='▸ '+r.name+': '+r.val+(r.unit?(' '+r.unit):'')+'\n'; });
   if(c.prodReport.length){ m+=SEP+'\n'+(c.role==='barista'?'🍵':'🥗')+' *ПРОИЗВОДСТВО*\n'; c.prodReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+' '+(r.unit||'шт')+'\n'; }); }
-  if(c.woReport.length){ m+=SEP+'\n🗑 *СПИСАНИЯ*\n'; c.woReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+'\n'; }); }
+  if(c.woReport.length){ m+=SEP+'\n🗑 *СПИСАНИЯ*\n'; c.woReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+(r.unit?(' '+r.unit):'')+'\n'; }); }
   if(c.zakup.length){ m+=SEP+'\n🛒 *ЗАКУП НА ЗАВТРА*\n'; c.zakup.forEach(function(z){ m+='▸ '+z+'\n'; }); }
   return m;
 }
@@ -618,6 +704,7 @@ function submitReport(role){
     window.open(url,'_blank');
     btn.disabled=false;
     btn.innerHTML='✅ Отправлено';
+    clearDraft(role);
     toast('Отчёт отправлен. Учёт проведётся в 22:00.');
     setTimeout(function(){ sending=false; renderForm(role); }, 1500);
   }, 400);
