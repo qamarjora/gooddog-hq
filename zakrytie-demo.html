@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#093023">
+<title>Закрытие смены — Good Dog</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#093023; --gm:#0d4a32; --y:#ffcc00; --white:#fff; --bg:#f8f8f6;
+  --text:#1a1a1a; --mu:#888; --bd:rgba(9,48,35,0.12); --dv:#efefeb;
+  --ibg:#fafaf8; --red:#e24b4a; --radius:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:'Manrope',sans-serif;background:var(--white);color:var(--text);-webkit-font-smoothing:antialiased;}
+header{background:var(--g);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;}
+.logo-bars{display:flex;gap:3px;align-items:flex-end;}
+.logo-bars span{display:block;width:4px;background:var(--y);border-radius:2px;}
+.logo-bars span:nth-child(1){height:12px;}.logo-bars span:nth-child(2){height:18px;}
+.logo-bars span:nth-child(3){height:22px;}.logo-bars span:nth-child(4){height:18px;}
+.logo-bars span:nth-child(5){height:12px;}
+.logo-text{color:var(--white);font-size:14px;font-weight:800;letter-spacing:.05em;}
+.logo-text span{color:var(--y);}
+.back-link{color:rgba(255,255,255,.7);font-size:13px;font-weight:600;text-decoration:none;}
+.back-link:hover{color:var(--y);}
+main{max-width:520px;margin:0 auto;padding:20px 14px 90px;}
+h1.page-title{font-size:20px;font-weight:800;color:var(--g);margin-bottom:4px;}
+.subtitle{color:var(--mu);font-size:13px;margin-bottom:18px;}
+.tabs{display:flex;gap:0;margin-bottom:18px;border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;}
+.tab{flex:1;padding:11px;background:var(--white);border:none;font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;color:var(--mu);cursor:pointer;transition:all .2s;}
+.tab.active{background:var(--g);color:var(--white);}
+.form{display:none;flex-direction:column;gap:12px;}
+.form.active{display:flex;}
+.card{background:var(--white);border:1.5px solid var(--bd);border-radius:16px;padding:14px 16px;box-shadow:0 1px 4px rgba(9,48,35,.05);}
+.card-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.group-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);padding:10px 0 6px;}
+.dt-row{display:flex;gap:8px;}
+.dt-inp{flex:1;font-size:14px;font-family:'Manrope',sans-serif;border:.5px solid var(--bd);border-radius:10px;padding:9px 12px;background:var(--ibg);color:var(--text);outline:none;}
+.dt-inp:focus{border-color:var(--g);}
+.name-field{display:flex;align-items:center;gap:6px;padding:8px 0;}
+.nf-label{font-size:12px;color:var(--mu);width:60px;flex-shrink:0;}
+.nf-inp{flex:1;font-size:14px;font-family:'Manrope',sans-serif;border:none;border-bottom:1px solid var(--bd);background:transparent;color:var(--text);outline:none;padding:2px 0;}
+.nf-inp:focus{border-color:var(--g);}
+.row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--dv);}
+.row:last-of-type{border-bottom:none;}
+.row-name{font-size:13px;font-weight:500;color:var(--text);flex:1;min-width:0;}
+.pid-badge{font-size:9px;color:var(--g);background:rgba(9,48,35,.07);border-radius:5px;padding:2px 5px;font-weight:700;}
+.num-inp{width:60px;font-size:13px;font-family:'Manrope',sans-serif;border:.5px solid var(--bd);border-radius:8px;padding:6px 7px;text-align:right;background:var(--ibg);color:var(--text);outline:none;-moz-appearance:textfield;}
+.num-inp::-webkit-outer-spin-button,.num-inp::-webkit-inner-spin-button{-webkit-appearance:none;}
+.num-inp:focus{border-color:var(--g);}
+.unit{font-size:11px;color:var(--mu);width:34px;flex-shrink:0;}
+.wo-row{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.wo-sel{flex:1;font-size:13px;font-family:'Manrope',sans-serif;border:1px solid var(--bd);border-radius:8px;padding:8px 9px;background:var(--white);color:var(--text);outline:none;min-width:0;}
+.wo-sel:focus{border-color:var(--g);}
+.wo-num{width:52px;font-size:13px;font-family:'Manrope',sans-serif;border:1px solid var(--bd);border-radius:8px;padding:7px;text-align:right;background:var(--ibg);color:var(--text);outline:none;-moz-appearance:textfield;}
+.wo-num::-webkit-outer-spin-button,.wo-num::-webkit-inner-spin-button{-webkit-appearance:none;}
+.wo-del{border:none;background:transparent;color:#b45309;cursor:pointer;font-size:18px;line-height:1;padding:0 4px;flex-shrink:0;}
+.add-btn{width:100%;margin-top:8px;padding:9px;font-size:13px;font-family:'Manrope',sans-serif;font-weight:600;color:var(--g);background:rgba(9,48,35,.05);border:1px dashed rgba(9,48,35,.25);border-radius:10px;cursor:pointer;}
+.add-btn:active{background:rgba(9,48,35,.1);}
+.sausage-box{margin-top:12px;padding:12px;background:var(--ibg);border:1px solid var(--bd);border-radius:12px;}
+.sausage-title{font-size:11px;font-weight:700;color:var(--g);margin-bottom:8px;}
+.hint{font-size:11px;color:var(--mu);text-align:center;margin-top:6px;}
+.hint.warn{color:var(--red);font-weight:600;}
+.wo-inp{width:100%;font-size:13px;font-family:'Manrope',sans-serif;border:.5px solid var(--bd);border-radius:10px;padding:9px 12px;background:var(--ibg);color:var(--text);outline:none;margin-bottom:7px;display:block;}
+.wo-inp:focus{border-color:var(--g);}
+.send-btn{width:100%;padding:15px;background:var(--g);color:var(--y);border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;margin-top:4px;}
+.send-btn:active{transform:scale(.98);}
+.send-btn:disabled{opacity:.6;}
+.send-btn svg{width:22px;height:22px;flex-shrink:0;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--g);color:var(--white);padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:300;transition:transform .3s;max-width:92%;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--red);}
+
+.cl-note{font-size:11px;color:var(--mu);margin-bottom:8px;line-height:1.4;}
+.cl-cat{border-bottom:1px solid var(--dv);}
+.cl-head{width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;padding:11px 2px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:var(--g);cursor:pointer;}
+.cl-head .cl-cnt{font-size:11px;color:var(--y);background:var(--g);border-radius:10px;padding:1px 7px;margin-left:auto;margin-right:8px;display:none;}
+.cl-head .cl-cnt.on{display:inline-block;}
+.cl-arrow{color:var(--mu);font-size:12px;}
+.cl-body{padding:2px 0 8px;}
+.cl-row{display:flex;align-items:center;gap:9px;padding:7px 2px;cursor:pointer;}
+.cl-check{width:19px;height:19px;flex-shrink:0;accent-color:var(--g);cursor:pointer;}
+.cl-name{flex:1;font-size:13px;color:var(--text);}
+.cl-min{font-size:11px;color:var(--mu);flex-shrink:0;text-align:right;}
+
+.wo-search{width:100%;font-size:13px;font-family:'Manrope',sans-serif;border:1px solid var(--bd);border-radius:10px;padding:9px 12px;background:var(--ibg);color:var(--text);outline:none;margin-bottom:10px;}
+.wo-search:focus{border-color:var(--g);}
+
+.wo-results{max-height:200px;overflow-y:auto;border:1px solid var(--bd);border-radius:10px;margin-bottom:10px;display:none;}
+.wo-results.show{display:block;}
+.wo-res{width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--dv);padding:11px 12px;font-family:'Manrope',sans-serif;font-size:13px;color:var(--text);cursor:pointer;}
+.wo-res:last-child{border-bottom:none;}
+.wo-res:active{background:var(--ibg);}
+.wo-chosen{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid var(--dv);}
+.wo-chosen:last-child{border-bottom:none;}
+.wo-cname{flex:1;font-size:13px;font-weight:500;color:var(--text);}
+.wo-empty{font-size:12px;color:var(--mu);padding:8px 2px;}
+
+.demo-banner{background:#fff6d6;border:1px solid #ffcc00;color:#7a5b00;border-radius:12px;padding:10px 14px;font-size:12.5px;font-weight:600;margin-bottom:14px;line-height:1.4;}
+.send-status{text-align:center;font-size:13px;margin-top:10px;min-height:18px;line-height:1.4;}
+.send-status.ok{color:var(--g);font-weight:700;}
+.send-status.err{color:var(--red);font-weight:700;}
+.send-status.wait{color:var(--mu);font-weight:600;}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">
+    <div class="logo-bars"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="logo-text">GOOD DOG <span>HQ</span></div>
+  </a>
+  <a class="back-link" href="index.html">← В меню</a>
+</header>
+
+<main>
+  <h1 class="page-title">🌙 Закрытие смены</h1>
+  <div class="demo-banner">🧪 ДЕМО-страница для проверки новой отправки. В Poster и учёт тут ничего не пишется — можно тыкать смело.</div><p class="subtitle">⚠️ Пиши остатки честно и точно — по ним ведётся учёт и контроль. Это важная часть работы: ошибка в цифрах = неверный учёт по всему кафе.</p>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-barista" onclick="switchRole('barista')">☕ Бариста</button>
+    <button class="tab" id="tab-cook" onclick="switchRole('cook')">🌭 Повар</button>
+  </div>
+
+  <div id="form-barista" class="form active"></div>
+  <div id="form-cook" class="form"></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ НАСТРОЙКИ ============
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwyOVRrfTJ65Y9QSQF9fCTAv4cNQuY_Mbg_9PYroMG8XULgSunvkAx404LTHuJWfNAj/exec';
+
+// Остатки на конец смены. posterId — только у сверяемых позиций (10 ключевых).
+const REMAINDERS = {
+  barista: [
+    { group:'Сухие / сыпучие', items:[
+      { name:'Кофе', unit:'кг' },
+      { name:'Горячий шоколад', unit:'кг' },
+    ]},
+    { group:'Жидкие', items:[
+      { name:'Молоко', unit:'л' },
+      { name:'Сливки', unit:'л' },
+      { name:'Сок апельсин', unit:'л' },
+      { name:'Сок вишня', unit:'л' },
+      { name:'Каркаде Вишня', unit:'шт', pid:'177' },
+    ]},
+    { group:'Стаканы', items:[
+      { name:'Стакан 0,4', unit:'шт', pid:'111' },
+      { name:'Стакан 0,3', unit:'шт', pid:'110' },
+      { name:'Стакан 0,2', unit:'шт', pid:'112' },
+      { name:'Стакан шейкер 0,4', unit:'шт', pid:'115' },
+    ]},
+  ],
+  cook: [
+    { group:'Хлеб и выпечка', items:[
+      { name:'Булочки', unit:'шт', pid:'33' },
+      { name:'Френч', unit:'шт', pid:'46' },
+    ]},
+    { group:'Мясо и полуфабрикаты', items:[
+      { name:'Гр. сосиски', unit:'шт', pid:'175' },
+      { name:'Кр. сосиски', unit:'шт', pid:'176' },
+      { name:'Фри', unit:'пач' },
+      { name:'Жареный лук', unit:'кг' },
+      { name:'Наггетсы', unit:'пач' },
+      { name:'Чипсы', unit:'пач' },
+    ]},
+    { group:'Соусы', items:[
+      { name:'Кетчуп', unit:'кг' },
+      { name:'Горчица', unit:'кг' },
+      { name:'Барбекю', unit:'кг' },
+      { name:'Сырный', unit:'кг' },
+    ]},
+  ],
+};
+
+// Производство за смену (штучно). type: 1=полуфабрикат, 2=тех.карта
+const PRODUCTION = {
+  barista: [
+    { name:'Каркаде Вишня', id:'79', type:'2', unit:'шт' },
+  ],
+  cook: [
+    { name:'Коул слоу', id:'29', type:'1', unit:'порция' },
+    { name:'Морковный', id:'30', type:'1', unit:'порция' },
+    { name:'Сальса',   id:'27', type:'1', unit:'порция' },
+  ],
+};
+
+// Сосиски (ингредиенты) для списания хот-догов
+const SAUSAGES = [
+  { name:'Говяжья', id:'175' },
+  { name:'Куриная', id:'176' },
+];
+
+// Список блюд для списания (product_id, type 2 = тех.карта; товары — type 1).
+// hd:true — хот-дог/комбо, требует выбора сосиски.
+const WRITEOFF_DISHES = [
+  // Хот-доги
+  { name:'Классический хот-дог', id:'19', type:'2', hd:true },
+  { name:'Мексиканский', id:'28', type:'2', hd:true },
+  { name:'Френч дог', id:'32', type:'2', hd:true },
+  { name:'Датский', id:'33', type:'2', hd:true },
+  { name:'Коул Слоу (хот-дог)', id:'34', type:'2', hd:true },
+  { name:'Морковный (хот-дог)', id:'35', type:'2', hd:true },
+  { name:'Чикаго', id:'36', type:'2', hd:true },
+  { name:'Сырный', id:'37', type:'2', hd:true },
+  { name:'Барбекю', id:'38', type:'2', hd:true },
+  // Кофе
+  { name:'Американо 250', id:'55', type:'2' },
+  { name:'Американо 350', id:'56', type:'2' },
+  { name:'Американо 450', id:'57', type:'2' },
+  { name:'Капучино 250', id:'48', type:'2' },
+  { name:'Капучино 350', id:'51', type:'2' },
+  { name:'Капучино 450', id:'53', type:'2' },
+  { name:'Латте 250', id:'49', type:'2' },
+  { name:'Латте 350', id:'50', type:'2' },
+  { name:'Латте 450', id:'52', type:'2' },
+  { name:'Раф 350', id:'85', type:'2' },
+  { name:'Раф 450', id:'86', type:'2' },
+  { name:'Раф Цитрус 450', id:'106', type:'2' },
+  { name:'Флейт Уайт 250', id:'54', type:'2' },
+  { name:'Горячий шоколад', id:'80', type:'2' },
+  { name:'Эспрессо 1 шот', id:'58', type:'2' },
+  { name:'Эспрессо 2 шот', id:'59', type:'2' },
+  // Холодное кофе
+  { name:'Айс Американо', id:'72', type:'2' },
+  { name:'Айс Латте', id:'73', type:'2' },
+  { name:'Бамбл (Апельсин)', id:'112', type:'2' },
+  { name:'Бамбл (Вишня)', id:'113', type:'2' },
+  { name:'Эспрессо Шейк', id:'76', type:'2' },
+  { name:'Эспрессо Тоник', id:'77', type:'2' },
+  // Молочные коктейли
+  { name:'Банановый шейк', id:'70', type:'2' },
+  { name:'Классический коктейль', id:'67', type:'2' },
+  { name:'Клубничный', id:'68', type:'2' },
+  { name:'Орео Шейк', id:'71', type:'2' },
+  { name:'Шоколадный', id:'69', type:'2' },
+  // Чаи
+  { name:'Чай чёрный', id:'60', type:'2' },
+  { name:'Чай зелёный', id:'61', type:'2' },
+  { name:'Малиновый чай', id:'62', type:'2' },
+  { name:'Облепиховый чай', id:'63', type:'2' },
+  { name:'Глинтвейн', id:'103', type:'2' },
+  { name:'Таёжный', id:'104', type:'2' },
+  { name:'Ягодный чай', id:'105', type:'2' },
+  // Лимонады / смузи / каркаде
+  { name:'Грейпфрут-Маракуйя', id:'64', type:'2' },
+  { name:'Киви-Лайм', id:'65', type:'2' },
+  { name:'Ягодный смузи', id:'114', type:'2' },
+  { name:'Каркаде Вишня', id:'79', type:'2' },
+  // Закуски
+  { name:'Фри', id:'20', type:'2' },
+  { name:'Наггетсы', id:'21', type:'2' },
+  // Товары
+  { name:'Напитки (кола, фанта…)', id:'111', type:'1' },
+  { name:'Вода', id:'17', type:'1' },
+  { name:'Детский сок', id:'82', type:'1' },
+  // Ингредиенты (списываются напрямую)
+  { name:'Стакан 0,2 (поштучно)', id:'112', type:'4', unit:'шт' },
+  { name:'Стакан 0,3 (поштучно)', id:'110', type:'4', unit:'шт' },
+  { name:'Стакан 0,4 (поштучно)', id:'111', type:'4', unit:'шт' },
+  { name:'Стакан шейкер 0,4 (поштучно)', id:'115', type:'4', unit:'шт' },
+  { name:'Булочки (поштучно)', id:'33', type:'4', unit:'шт' },
+  { name:'Булочки Френч (поштучно)', id:'46', type:'4', unit:'шт' },
+  { name:'Кофе', id:'74', type:'4', unit:'кг' },
+];
+
+
+// ============ ЧЕК-ЛИСТ ЗАКУПА ============
+const CHECKLIST = {
+  barista: [
+    { cat:'Основное', items:[
+      {n:'Кофе',m:'мин. 1 кг'},{n:'Молоко',m:'мин. 10 л'},{n:'Горячий шоколад',m:'мин. 1/3 ёмкости'},
+      {n:'Сливки',m:'мин. 500 мл'},{n:'Чай чёрный',m:'мин. 1/3 пачки'},{n:'Чай зелёный',m:'мин. 1/3 пачки'},
+      {n:'Каркаде листовой',m:'мин. 200 г'},{n:'Мороженое',m:'мин. 1 тара'},{n:'Лёд',m:'мин. 0,5 пачки'},
+      {n:'Сахар килограммовый',m:'мин. 1/3 кг'},
+    ]},
+    { cat:'Сиропы, пюре, топпинги', items:[
+      {n:'Пинч Карамель',m:'мин. 1/3 л'},{n:'Пинч Солёная карамель',m:'мин. 1/3 л'},{n:'Пинч Ваниль',m:'мин. 1/3 л'},
+      {n:'Пинч Лесной орех',m:'мин. 1/3 л'},{n:'Пинч Шоколад',m:'мин. 1/3 л'},{n:'Пинч Попкорн',m:'мин. 1/3 л'},
+      {n:'Пинч Кокос',m:'мин. 1/3 л'},{n:'Пинч Малина',m:'мин. 1/3 л'},{n:'Пинч Смородина',m:'мин. 1/3 л'},
+      {n:'Пинч Банан',m:'мин. 1/3 л'},{n:'Пинч Гранат',m:'мин. 1/3 л'},{n:'Пинч Манго',m:'мин. 1/3 л'},
+      {n:'Пинч Зелёное яблоко',m:'мин. 1/3 л'},{n:'Пинч Мохито',m:'мин. 1/3 л'},{n:'Пинч Сок лимона',m:'мин. 1/3 л'},
+      {n:'Пюре Клюква',m:'мин. 1/3 л'},{n:'Пюре Облепиха',m:'мин. 1/3 л'},{n:'Пюре Маракуйя с косточкой',m:'мин. 1/3 л'},
+      {n:'Пюре Киви',m:'мин. 1/3 л'},{n:'Пюре Вишня',m:'мин. 1/3 л'},{n:'Имбирь конфитюр',m:'мин. 1/3 л'},
+      {n:'Шоколад топпинг',m:'мин. 1/3 л'},{n:'Клубника топпинг',m:'мин. 1/3 л'},
+    ]},
+    { cat:'Фрукты и заморозка', items:[
+      {n:'Лимон',m:'мин. 1 шт'},{n:'Банан',m:'мин. 0,5 пучка'},{n:'Апельсин',m:'мин. 1 шт'},
+      {n:'Малина замороженная',m:'мин. 1/3 пачки'},
+    ]},
+    { cat:'Напитки', items:[
+      {n:'Апельсин Piko 1л',m:'мин. 1 л'},{n:'Вишнёвый сок',m:'мин. 1 л'},{n:'Тоник ЖБ',m:'мин. 2 шт'},
+      {n:'Вода 0,5',m:'мин. 1 упак.'},{n:'Кола',m:'мин. 1 упак.'},{n:'Фанта',m:'мин. 1 упак.'},
+      {n:'Fuse tea',m:'мин. 2 упак.'},{n:'Детский сок',m:'мин. 1 упак.'},{n:'Сарыагаш',m:'мин. 2 шт'},
+    ]},
+    { cat:'Одноразовая посуда', items:[
+      {n:'Стакан 0,3',m:'мин. 50 шт'},{n:'Стакан 0,4',m:'мин. 50 шт'},{n:'Стакан 0,2',m:'мин. 50 шт'},
+      {n:'Стакан 0,1 для эспрессо',m:'мин. 25 шт'},{n:'Одноразовый стакан 0,2',m:'мин. 25 шт'},{n:'Шейкер 400 мл',m:'мин. 50 шт'},
+      {n:'Крышки для холодного',m:'мин. 50 шт'},{n:'Крышки для горячего',m:'мин. 50 шт'},{n:'Бутылка 300 мл',m:'мин. 20 шт'},
+      {n:'Палочки',m:'мин. 1/3 пачки'},{n:'Подстаканник двойной',m:'мин. 20 шт'},{n:'Подстаканник четверной',m:'мин. 20 шт'},
+      {n:'Трубочки толстые',m:'мин. 1/3 пачки'},{n:'Кап холдер',m:'мин. 1 пачка'},{n:'Сахар в стиках',m:'мин. 1/3 коробки'},
+      {n:'Влажные салфетки',m:'мин. 1/3 коробки'},{n:'Обычные салфетки',m:'мин. 10 пачек'},
+    ]},
+    { cat:'Хоз товары', items:[
+      {n:'Гарбич 160 л',m:'мин. 1 рулон'},{n:'Тряпка для швабры',m:'мин. 1 шт'},{n:'Микрофибра',m:'мин. 1 пачка'},
+      {n:'Микрофибра для стекла',m:'мин. 1 шт'},{n:'Губки',m:'мин. 1 пачка'},{n:'Азелит',m:'мин. 1/3 л'},
+      {n:'Фэйри',m:'мин. 1/3 л'},{n:'Мистер Мускул',m:'мин. 1/3 л'},{n:'Средство для стёкол',m:'мин. 1/3 л'},
+      {n:'Порошок для кофемашины',m:'мин. 1/3 упак.'},{n:'Антисептик 1 л',m:'мин. 1/3 л'},
+    ]},
+    { cat:'Канц товары', items:[
+      {n:'Чековая бумага 80 мм',m:'мин. 1 пачка'},{n:'Маркеры',m:'мин. 1 шт'},{n:'Степлер / скобы',m:'мин. 1 пачка'},{n:'Ручки',m:'мин. 1 шт'},
+    ]},
+  ],
+  cook: [
+    { cat:'Мясо и хлеб', items:[
+      {n:'Сосиски говяжьи',m:'каждый день'},{n:'Сосиски куриные',m:'мин. 2 пачки'},
+      {n:'Булочки',m:'каждый день'},{n:'Булочки для френч',m:'мин. 20 шт'},
+    ]},
+    { cat:'Соусы', items:[
+      {n:'Кетчуп',m:'мин. 1 кг'},{n:'Барбекю',m:'мин. 1 кг'},{n:'Сырный',m:'мин. 1 кг'},
+      {n:'Сладкая горчица',m:'мин. 1 кг'},{n:'Табаска',m:'мин. 2 шт'},
+    ]},
+    { cat:'Добавки', items:[
+      {n:'Жареный лук',m:'мин. 0,5 кг'},{n:'Чипсы',m:'мин. 1 пачка'},{n:'Сыр ломтики Чеддер',m:'мин. 1/3 пачки'},
+      {n:'Халапеньо',m:'мин. 1/3 банки'},{n:'Огурцы маринованные',m:'мин. 0,5 банки'},
+    ]},
+    { cat:'Закуски', items:[
+      {n:'Фри',m:'мин. 3 пачки'},{n:'Наггетсы',m:'мин. 1 пачка'},
+    ]},
+    { cat:'Прочее', items:[
+      {n:'Масло для фри',m:'мин. 1/3 канистры'},{n:'Соль Экстра',m:'мин. 1/3 пачки'},{n:'Майонез',m:'мин. 1/3 пачки'},
+      {n:'Сметана',m:'мин. 1/3 пачки'},{n:'Чим чим',m:'мин. 1 шт'},
+    ]},
+    { cat:'Овощи', items:[
+      {n:'Помидор',m:'мин. 1 кг'},{n:'Белый лук',m:'мин. 0,5 кг'},{n:'Красный лук',m:'мин. 0,5 кг'},
+      {n:'Красная капуста',m:'мин. 1 кг'},{n:'Белая капуста',m:'мин. 1 кг'},{n:'Огурцы',m:'мин. 2 шт'},
+      {n:'Морковь',m:'мин. 0,5 кг'},{n:'Укроп',m:'мин. 1 пучок'},{n:'Кинза',m:'мин. 1 пучок'},
+    ]},
+    { cat:'Одноразовая посуда', items:[
+      {n:'Бокс с собой',m:'мин. 50 шт'},{n:'Обёртка',m:'мин. 1/3 пачки'},{n:'Пакет для френч',m:'мин. 50 шт'},
+      {n:'Пакет для фри',m:'мин. 50 шт'},{n:'Соусница',m:'мин. 50 шт'},{n:'Крафт пакеты',m:'мин. 50 шт'},
+      {n:'Маячка',m:'мин. 1 рулон'},{n:'Перчатки виниловые',m:'мин. 1 пачка'},{n:'Фольга',m:'мин. 1 рулон'},
+      {n:'Влажные салфетки',m:'мин. 1/3 коробки'},{n:'Обычные салфетки',m:'мин. 10 пачек'},
+    ]},
+  ],
+};
+
+function checklistHTML(role){
+  return CHECKLIST[role].map(function(cat,ci){
+    const cid = role+'-cat-'+ci;
+    const rows = cat.items.map(function(it){
+      return '<label class="cl-row"><input type="checkbox" class="cl-check" data-name="'+esc(it.n)+'" onchange="catCount(\''+cid+'\');saveDraft(activeRole)">'+
+             '<span class="cl-name">'+esc(it.n)+'</span>'+
+             '<span class="cl-min">'+esc(it.m||'')+'</span></label>';
+    }).join('');
+    return '<div class="cl-cat">'+
+      '<button type="button" class="cl-head" onclick="toggleCat(\''+cid+'\')">'+
+        '<span>'+esc(cat.cat)+'</span>'+
+        '<span class="cl-cnt" id="cnt-'+cid+'"></span>'+
+        '<span class="cl-arrow" id="arr-'+cid+'">&#9656;</span>'+
+      '</button>'+
+      '<div class="cl-body" id="'+cid+'" style="display:none;">'+rows+'</div>'+
+    '</div>';
+  }).join('');
+}
+function toggleCat(id){
+  const b=document.getElementById(id); const a=document.getElementById('arr-'+id);
+  if(b.style.display==='none'){ b.style.display='block'; a.innerHTML='&#9662;'; }
+  else { b.style.display='none'; a.innerHTML='&#9656;'; }
+}
+function catCount(cid){
+  const body=document.getElementById(cid);
+  const n=body.querySelectorAll('.cl-check:checked').length;
+  const badge=document.getElementById('cnt-'+cid);
+  if(n>0){ badge.textContent=n; badge.classList.add('on'); }
+  else{ badge.textContent=''; badge.classList.remove('on'); }
+}
+
+let activeRole = 'barista';
+let sending = false;
+
+function todayDMY(){
+  const d=new Date();
+  return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
+}
+
+// ============ РЕНДЕР ============
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function remaindersHTML(role){
+  return REMAINDERS[role].map(function(g){
+    return '<div class="group-label">'+esc(g.group)+'</div>'+
+      g.items.map(function(it){
+        const badge = it.pid ? '<span class="pid-badge">сверка</span>' : '';
+        const pid = it.pid ? ' data-pid="'+it.pid+'"' : '';
+        return '<div class="row">'+
+          '<span class="row-name">'+esc(it.name)+' '+badge+'</span>'+
+          '<input class="num-inp rem-inp" type="number" min="0" placeholder="0" oninput="onFormInput(\''+role+'\')"'+pid+' data-name="'+esc(it.name)+'">'+
+          '<span class="unit">'+esc(it.unit)+'</span>'+
+        '</div>';
+      }).join('');
+  }).join('');
+}
+
+function productionHTML(role){
+  return PRODUCTION[role].map(function(p){
+    return '<div class="row">'+
+      '<span class="row-name">'+esc(p.name)+'</span>'+
+      '<input class="num-inp prod-inp" type="number" min="0" placeholder="0" data-id="'+p.id+'" data-type="'+p.type+'" oninput="onFormInput(\''+role+'\')" data-name="'+esc(p.name)+'" data-unit="'+esc(p.unit||'шт')+'">'+
+      '<span class="unit">'+esc(p.unit||'шт')+'</span>'+
+    '</div>';
+  }).join('');
+}
+
+function renderForm(role){
+  const isBar = role==='barista';
+  let h = '';
+  // дата (автоматически сегодня) + сотрудник
+  h += '<div class="card"><div class="card-title">🗓 Дата</div>'+
+       '<div class="name-field"><span class="nf-label">Сегодня</span><input class="nf-inp" type="text" id="'+role+'-date" readonly value="'+todayDMY()+'"></div></div>';
+  h += '<div class="card"><div class="card-title">👤 Сотрудник</div>'+
+       '<div class="name-field"><span class="nf-label">Имя</span><input class="nf-inp" type="text" id="'+role+'-name" oninput="onFormInput(\''+role+'\')" placeholder="Введите имя..."></div></div>';
+  // остатки
+  h += '<div class="card"><div class="card-title">📦 Остатки на конец смены</div>'+remaindersHTML(role)+'</div>';
+  // производство
+  h += '<div class="card"><div class="card-title">'+(isBar?'🍵':'🥗')+' Производство за смену</div>'+productionHTML(role)+'</div>';
+  // списание (только бариста)
+  if(isBar){
+    h += '<div class="card"><div class="card-title">🗑 Списание за смену</div>'+
+         '<input class="wo-search" id="wo-search" type="text" placeholder="🔍 Начни писать блюдо..." oninput="woSearch(this.value)" onfocus="woSearch(this.value)">'+
+         '<div class="wo-results" id="wo-results"></div>'+
+         '<div id="wo-list"><div class="wo-empty">Пока ничего не выбрано. Найди блюдо выше и нажми.</div></div>'+
+         '<div class="sausage-box">'+
+           '<div class="sausage-title">🌭 Сосиски (для списанных хот-догов)</div>'+
+           SAUSAGES.map(function(s){
+             return '<div class="row"><span class="row-name">'+esc(s.name)+' сосиска</span>'+
+               '<input class="num-inp saus-inp" type="number" min="0" placeholder="0" data-id="'+s.id+'" data-name="'+esc(s.name)+'" oninput="updateSausageHint();saveDraft(activeRole)">'+
+               '<span class="unit">шт</span></div>';
+           }).join('')+
+           '<div class="hint" id="saus-hint"></div>'+
+         '</div>'+
+         '</div>';
+  }
+  // чек-лист закупа
+  h += '<div class="card"><div class="card-title">🛒 Чек-лист закупа</div>'+
+       '<p class="cl-note">Отметь, что нужно купить. «Мин. остаток» — порог, ниже которого позицию заказываем.</p>'+
+       checklistHTML(role)+
+       '<div class="group-label">Другое (вписать вручную)</div>'+
+       '<div id="'+role+'-zakup"><input class="wo-inp" type="text" placeholder="Что ещё купить..." oninput="saveDraft(\''+role+'\')"></div>'+
+       '<button class="add-btn" onclick="addZakup(\''+role+'\')">+ Добавить строку</button></div>';
+  // кнопка
+  h += '<button class="send-btn" id="'+role+'-send" disabled onclick="submitReport(\''+role+'\')">'+
+       '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.098.544 4.07 1.496 5.789L.057 23.854c-.073.274.196.537.468.457l6.186-1.602A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.028-1.383l-.36-.214-3.732.966.999-3.626-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>'+
+       'Отправить отчёт</button>';
+  h += '<div class="send-status" id="'+role+'-status"></div>';
+
+  document.getElementById('form-'+role).innerHTML = h;
+
+  restoreDraft(role);
+  checkReady(role);
+}
+
+// кнопка активна только если форма заполнена по-настоящему (имя + минимум 3 остатка)
+function checkReady(role){
+  const nameEl=document.getElementById(role+'-name');
+  if(!nameEl) return;
+  const name=nameEl.value.trim();
+  let filled=0;
+  document.querySelectorAll('#form-'+role+' .rem-inp').forEach(function(i){ if(i.value.trim()!=='') filled++; });
+  const btn=document.getElementById(role+'-send');
+  if(!btn) return;
+  btn.disabled = !(name!=='' && filled>=3);
+}
+
+// ============ СПИСАНИЕ: поиск и выбор ============
+function woSearch(q){
+  const box=document.getElementById('wo-results'); if(!box) return;
+  q=(q||'').toLowerCase().trim();
+  if(q===''){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const chosen=getChosenIdx();
+  const hits=[];
+  for(let i=0;i<WRITEOFF_DISHES.length && hits.length<10;i++){
+    if(chosen.indexOf(i)!==-1) continue;
+    if(WRITEOFF_DISHES[i].name.toLowerCase().indexOf(q)!==-1) hits.push(i);
+  }
+  if(!hits.length){ box.classList.add('show'); box.innerHTML='<div class="wo-empty" style="padding:11px 12px;">Ничего не найдено</div>'; return; }
+  box.innerHTML=hits.map(function(i){ return '<button type="button" class="wo-res" onclick="woAdd('+i+')">'+esc(WRITEOFF_DISHES[i].name)+'</button>'; }).join('');
+  box.classList.add('show');
+}
+function getChosenIdx(){
+  const arr=[]; document.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){ arr.push(parseInt(r.getAttribute('data-idx'),10)); }); return arr;
+}
+function woAdd(idx){
+  const list=document.getElementById('wo-list'); if(!list) return;
+  const empty=list.querySelector('.wo-empty'); if(empty) empty.remove();
+  const dd=WRITEOFF_DISHES[idx];
+  const div=document.createElement('div');
+  div.className='wo-chosen'; div.setAttribute('data-idx',idx);
+  const unit = dd.unit || 'шт';
+  const step = (unit==='кг' || unit==='л') ? '0.1' : '1';
+  div.innerHTML='<span class="wo-cname">'+esc(dd.name)+'</span>'+
+    '<input class="wo-num" type="number" min="0" step="'+step+'" value="1" oninput="updateSausageHint();saveDraft(activeRole)">'+
+    '<span class="unit">'+esc(unit)+'</span>'+
+    '<button class="wo-del" onclick="woRemove(this)">×</button>';
+  list.appendChild(div);
+  const inp=document.getElementById('wo-search'); if(inp) inp.value='';
+  const box=document.getElementById('wo-results'); if(box){ box.classList.remove('show'); box.innerHTML=''; }
+  updateSausageHint(); saveDraft(activeRole);
+}
+function woRemove(btn){
+  const list=document.getElementById('wo-list');
+  btn.parentElement.remove();
+  if(!list.querySelector('.wo-chosen')) list.innerHTML='<div class="wo-empty">Пока ничего не выбрано. Найди блюдо выше и нажми.</div>';
+  updateSausageHint(); saveDraft(activeRole);
+}
+function countHotdogs(){
+  let n=0;
+  document.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){
+    const dd=WRITEOFF_DISHES[parseInt(r.getAttribute('data-idx'),10)];
+    const num=parseInt(r.querySelector('.wo-num').value,10)||0;
+    if(dd && dd.hd) n+=num;
+  });
+  return n;
+}
+function countSausages(){
+  let n=0; document.querySelectorAll('.saus-inp').forEach(function(i){ n+=parseInt(i.value,10)||0; }); return n;
+}
+function updateSausageHint(){
+  const hint=document.getElementById('saus-hint'); if(!hint) return;
+  const hd=countHotdogs(), s=countSausages();
+  if(hd===0 && s===0){ hint.textContent=''; hint.className='hint'; return; }
+  if(hd===s){ hint.textContent='✅ Сосиски сходятся с хот-догами ('+hd+')'; hint.className='hint'; }
+  else{ hint.textContent='⚠️ Хот-догов: '+hd+', сосисок: '+s+' — проверь'; hint.className='hint warn'; }
+}
+
+// ============ ЗАКУП ============
+function addZakup(role){
+  const list=document.getElementById(role+'-zakup');
+  const i=document.createElement('input');
+  i.className='wo-inp'; i.type='text'; i.placeholder='Что ещё купить...';
+  i.setAttribute('oninput','saveDraft(\''+role+'\')');
+  list.appendChild(i); i.focus(); saveDraft(role);
+}
+
+// ============ СБОР ДАННЫХ ============
+function collect(role){
+  // остатки (для отчёта) + факт для сверки
+  const remainders=[]; const fact={};
+  document.querySelectorAll('#form-'+role+' .rem-inp').forEach(function(i){
+    const name=i.getAttribute('data-name'); const val=i.value.trim();
+    const unit=i.nextElementSibling && i.nextElementSibling.classList.contains('unit') ? i.nextElementSibling.textContent : '';
+    remainders.push({name:name, val:(val===''?'—':val), unit:unit});
+    const pid=i.getAttribute('data-pid');
+    if(pid && val!==''){ fact[pid]=parseFloat(val); }
+  });
+  // производство
+  const manufacture=[]; const prodReport=[];
+  document.querySelectorAll('#form-'+role+' .prod-inp').forEach(function(i){
+    const num=parseInt(i.value,10)||0;
+    if(num>0){
+      manufacture.push({id:i.getAttribute('data-id'),type:i.getAttribute('data-type'),num:num});
+      prodReport.push({name:i.getAttribute('data-name'),num:num,unit:(i.getAttribute('data-unit')||'шт')});
+    }
+  });
+  // списание (только бариста)
+  const writeoff=[]; const woReport=[];
+  if(role==='barista'){
+    document.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){
+      const num=parseFloat(r.querySelector('.wo-num').value)||0;
+      if(num<=0) return;
+      const dd=WRITEOFF_DISHES[parseInt(r.getAttribute('data-idx'),10)];
+      writeoff.push({id:dd.id,type:dd.type,num:num});
+      woReport.push({name:dd.name,num:num,unit:(dd.unit||'')});
+    });
+    document.querySelectorAll('.saus-inp').forEach(function(i){
+      const num=parseInt(i.value,10)||0;
+      if(num>0){
+        writeoff.push({id:i.getAttribute('data-id'),type:'4',num:num});
+        woReport.push({name:i.getAttribute('data-name')+' сосиска',num:num});
+      }
+    });
+  }
+  // закуп: отмеченные в чек-листе + вписанные вручную
+  const zakup=[];
+  document.querySelectorAll('#form-'+role+' .cl-check:checked').forEach(function(c){ zakup.push(c.getAttribute('data-name')); });
+  document.querySelectorAll('#'+role+'-zakup input').forEach(function(i){ if(i.value.trim()) zakup.push(i.value.trim()); });
+
+  const dateEl=document.getElementById(role+'-date');
+  return {
+    role:role,
+    name:(document.getElementById(role+'-name').value.trim()||'—'),
+    date:(dateEl?dateEl.value:todayDMY()),
+    remainders:remainders, prodReport:prodReport, woReport:woReport, zakup:zakup,
+    payload:{ role:role, manufacture:manufacture, writeoff:writeoff, fact:fact,
+      names:{
+        manufacture: prodReport.map(function(r){return r.name+' × '+r.num;}),
+        writeoff: woReport.map(function(r){return r.name+' × '+r.num;})
+      }
+    }
+  };
+}
+
+
+// ============ ЧЕРНОВИК (автосохранение до отправки) ============
+function draftKey(role){ return 'gd_draft_'+role; }
+
+// собрать всё введённое в компактный объект
+function readDraft(role){
+  const form=document.getElementById('form-'+role); if(!form) return null;
+  const d={ name:'', rem:{}, prod:{}, saus:{}, wo:[], check:[], zakup:[] };
+  const nameEl=document.getElementById(role+'-name'); if(nameEl) d.name=nameEl.value;
+  form.querySelectorAll('.rem-inp').forEach(function(i){ if(i.value!=='') d.rem[i.getAttribute('data-name')]=i.value; });
+  form.querySelectorAll('.prod-inp').forEach(function(i){ if(i.value!=='') d.prod[i.getAttribute('data-name')]=i.value; });
+  form.querySelectorAll('.saus-inp').forEach(function(i){ if(i.value!=='') d.saus[i.getAttribute('data-name')]=i.value; });
+  form.querySelectorAll('#wo-list .wo-chosen').forEach(function(r){ d.wo.push({idx:r.getAttribute('data-idx'), num:r.querySelector('.wo-num').value}); });
+  form.querySelectorAll('.cl-check:checked').forEach(function(c){ d.check.push(c.getAttribute('data-name')); });
+  form.querySelectorAll('#'+role+'-zakup input').forEach(function(i){ if(i.value.trim()) d.zakup.push(i.value); });
+  return d;
+}
+function saveDraft(role){
+  try{ localStorage.setItem(draftKey(role), JSON.stringify(readDraft(role))); }catch(e){}
+}
+function clearDraft(role){
+  try{ localStorage.removeItem(draftKey(role)); }catch(e){}
+}
+// вызывается из oninput всех полей
+function onFormInput(role){ checkReady(role); saveDraft(role); }
+
+// восстановить черновик в отрисованную форму
+function restoreDraft(role){
+  let raw; try{ raw=localStorage.getItem(draftKey(role)); }catch(e){ raw=null; }
+  if(!raw) return;
+  let d; try{ d=JSON.parse(raw); }catch(e){ return; }
+  const form=document.getElementById('form-'+role); if(!form) return;
+  const nameEl=document.getElementById(role+'-name'); if(nameEl && d.name) nameEl.value=d.name;
+  form.querySelectorAll('.rem-inp').forEach(function(i){ const k=i.getAttribute('data-name'); if(d.rem&&d.rem[k]!==undefined) i.value=d.rem[k]; });
+  form.querySelectorAll('.prod-inp').forEach(function(i){ const k=i.getAttribute('data-name'); if(d.prod&&d.prod[k]!==undefined) i.value=d.prod[k]; });
+  form.querySelectorAll('.saus-inp').forEach(function(i){ const k=i.getAttribute('data-name'); if(d.saus&&d.saus[k]!==undefined) i.value=d.saus[k]; });
+  // списание
+  if(d.wo && d.wo.length){
+    d.wo.forEach(function(item){
+      woAdd(parseInt(item.idx,10));
+      const rows=form.querySelectorAll('#wo-list .wo-chosen');
+      const last=rows[rows.length-1];
+      if(last){ last.querySelector('.wo-num').value=item.num; }
+    });
+  }
+  // чек-лист
+  if(d.check && d.check.length){
+    form.querySelectorAll('.cl-check').forEach(function(c){
+      if(d.check.indexOf(c.getAttribute('data-name'))!==-1){ c.checked=true; }
+    });
+    // обновить счётчики категорий
+    form.querySelectorAll('.cl-body').forEach(function(b){ if(b.id) catCount(b.id); });
+  }
+  // закуп (другое)
+  if(d.zakup && d.zakup.length){
+    const list=document.getElementById(role+'-zakup');
+    if(list){
+      list.querySelectorAll('input').forEach(function(i){ i.remove(); });
+      d.zakup.forEach(function(v){
+        const i=document.createElement('input'); i.className='wo-inp'; i.type='text'; i.placeholder='Что ещё купить...'; i.value=v;
+        list.appendChild(i);
+      });
+    }
+  }
+  updateSausageHint();
+  checkReady(role);
+}
+
+// ============ WhatsApp текст ============
+function fmtDate(v){ if(!v) return '—'; const p=v.split('-'); return p[2]+'.'+p[1]+'.'+p[0]; }
+function buildWA(c){
+  const SEP='━━━━━━━━━━━━━━━';
+  const head=c.role==='barista'?'☕ *ОТЧЁТ БАРИСТЫ — GOOD DOG*':'🌭 *ОТЧЁТ ПОВАРА — GOOD DOG*';
+  let m=head+'\n👤 '+c.name+'\n📅 '+(c.date||todayDMY())+'\n'+SEP+'\n';
+  m+='📦 *ОСТАТКИ НА КОНЕЦ СМЕНЫ*\n';
+  c.remainders.forEach(function(r){ m+='▸ '+r.name+': '+r.val+(r.unit?(' '+r.unit):'')+'\n'; });
+  if(c.prodReport.length){ m+=SEP+'\n'+(c.role==='barista'?'🍵':'🥗')+' *ПРОИЗВОДСТВО*\n'; c.prodReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+' '+(r.unit||'шт')+'\n'; }); }
+  if(c.woReport.length){ m+=SEP+'\n🗑 *СПИСАНИЯ*\n'; c.woReport.forEach(function(r){ m+='▸ '+r.name+': '+r.num+(r.unit?(' '+r.unit):'')+'\n'; }); }
+  if(c.zakup.length){ m+=SEP+'\n🛒 *ЗАКУП НА ЗАВТРА*\n'; c.zakup.forEach(function(z){ m+='▸ '+z+'\n'; }); }
+  return m;
+}
+
+// ============ ОТПРАВКА ============
+function submitReport(role){
+  if(sending) return;
+  const c=collect(role);
+  if(c.name==='—'){ toast('Впиши имя сотрудника',true); setStatus(role,'Впиши имя сотрудника','err'); return; }
+  c.payload.demo = true; // ДЕМО: бэкенд не сохраняет и не проводит
+
+  sending=true;
+  const btn=document.getElementById(role+'-send');
+  btn.disabled=true; btn.textContent='⏳ Отправляю отчёт...';
+  setStatus(role,'Отправляю отчёт, подожди…','wait');
+
+  const controller = ('AbortController' in window) ? new AbortController() : null;
+  const timer = setTimeout(function(){ if(controller) controller.abort(); }, 8000);
+
+  fetch(WEBHOOK_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(c.payload),
+    signal: controller ? controller.signal : undefined
+  })
+  .then(function(r){ return r.json().catch(function(){ return { ok:true }; }); })
+  .then(function(res){
+    clearTimeout(timer);
+    if(res && res.ok===false) throw new Error('server');
+    // успех — отчёт точно дошёл
+    const msg=buildWA(c);
+    const url=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      ? 'whatsapp://send?text='+encodeURIComponent(msg)
+      : 'https://wa.me/?text='+encodeURIComponent(msg);
+    window.open(url,'_blank');
+    btn.innerHTML='✅ Отчёт отправлен';
+    setStatus(role,'✅ Отчёт отправлен','ok');
+    clearDraft(role);
+    setTimeout(function(){ sending=false; renderForm(role); }, 2000);
+  })
+  .catch(function(){
+    clearTimeout(timer);
+    sending=false;
+    btn.disabled=false; btn.innerHTML='🔁 Отправить ещё раз';
+    setStatus(role,'❌ Отчёт НЕ отправлен. Проверь интернет и нажми «Отправить ещё раз».','err');
+    toast('Отчёт не отправлен — повтори',true);
+  });
+}
+
+// ============ TABS / TOAST ============
+function switchRole(role){
+  activeRole=role;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.form').forEach(function(f){f.classList.remove('active');});
+  document.getElementById('tab-'+role).classList.add('active');
+  document.getElementById('form-'+role).classList.add('active');
+}
+function toast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(err?' error':'');
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+
+// ============ INIT ============
+renderForm('barista');
+renderForm('cook');
+</script>
+</body>
+</html>
