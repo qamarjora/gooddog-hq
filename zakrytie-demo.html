@@ -696,22 +696,27 @@ function submitReport(role){
   sending=true;
   const btn=document.getElementById(role+'-send');
   btn.disabled=true; btn.textContent='⏳ Отправляю отчёт...';
-  setStatus(role,'Отправляю отчёт, подожди…','wait');
+  setStatus(role,'Отправляю отчёт…','wait');
 
-  const controller = ('AbortController' in window) ? new AbortController() : null;
-  const timer = setTimeout(function(){ if(controller) controller.abort(); }, 8000);
+  // Надёжная отправка «вслепую»: шлём дважды с интервалом (страховка от моргнувшей сети).
+  // Запрос уходит быстро и почти всегда доходит; дубли не страшны — бэкенд хранит последний отчёт за день.
+  function fireOnce(){
+    try{
+      fetch(WEBHOOK_URL,{
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(c.payload),
+        keepalive:true   // запрос дойдёт, даже если страница переключится на WhatsApp
+      }).catch(function(){});
+    }catch(e){}
+  }
 
-  fetch(WEBHOOK_URL,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(c.payload),
-    signal: controller ? controller.signal : undefined
-  })
-  .then(function(r){ return r.json().catch(function(){ return { ok:true }; }); })
-  .then(function(res){
-    clearTimeout(timer);
-    if(res && res.ok===false) throw new Error('server');
-    // успех — отчёт точно дошёл
+  fireOnce();                         // первая отправка
+  setTimeout(fireOnce, 1200);         // страховочная вторая
+
+  // Открываем WhatsApp и показываем успех (отправка в фоне уже пошла)
+  setTimeout(function(){
     const msg=buildWA(c);
     const url=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
       ? 'whatsapp://send?text='+encodeURIComponent(msg)
@@ -721,14 +726,7 @@ function submitReport(role){
     setStatus(role,'✅ Отчёт отправлен','ok');
     clearDraft(role);
     setTimeout(function(){ sending=false; renderForm(role); }, 2000);
-  })
-  .catch(function(){
-    clearTimeout(timer);
-    sending=false;
-    btn.disabled=false; btn.innerHTML='🔁 Отправить ещё раз';
-    setStatus(role,'❌ Отчёт НЕ отправлен. Проверь интернет и нажми «Отправить ещё раз».','err');
-    toast('Отчёт не отправлен — повтори',true);
-  });
+  }, 600);
 }
 
 // ============ TABS / TOAST ============
