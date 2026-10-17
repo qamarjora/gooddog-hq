@@ -40,6 +40,9 @@ var SUPPLY_CONST = {
   MODE_COEF: 'коэффициент',
   MODE_PIECES: 'ввод штук',
   MODE_SKIP: 'пропускать',
+  MODE_ASK_PACK: 'спросить упаковку',    // бот спрашивает, сколько в одной упаковке; на склад = кол-во упаковок × ответ
+  MODE_ASK_QTY: 'спросить количество',   // бот спрашивает итоговое количество в единицах склада (соусы, сливки)
+  MODE_JARS: 'банки',                    // бот спрашивает чистый вес одной банки; на склад = вес × число банок
 
   STAFF_ACTIVE: 'активен',
   STAFF_DISABLED: 'отключён',
@@ -207,4 +210,10 @@ function supplyEsc_(s) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+/** Режимы, при которых бот спрашивает число у сотрудника (ввод штук — прежний режим). */
+function supplyModeAsks_(mode) {
+  return mode === SUPPLY_CONST.MODE_PIECES || mode === SUPPLY_CONST.MODE_ASK_PACK ||
+    mode === SUPPLY_CONST.MODE_ASK_QTY || mode === SUPPLY_CONST.MODE_JARS;
 }

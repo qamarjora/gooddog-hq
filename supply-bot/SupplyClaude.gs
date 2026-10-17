@@ -14,7 +14,7 @@ function supplyClaudePrompt_() {
     '  "doc_number": "номер накладной; для чека — № чека; null если нет",',
     '  "fp": "фискальный признак (ФП) чека; null если нет",',
     '  "datetime": "YYYY-MM-DD или YYYY-MM-DD HH:MM (для чека со временем)",',
-    '  "items": [ {"sku": "артикул или null", "name": "...", "qty": 0, "unit": "шт", "price": 0, "sum": 0} ],',
+    '  "items": [ {"sku": "артикул или null", "name": "...", "qty": 0, "unit": "шт", "price": 0, "sum": 0, "pack": null} ],',
     '  "total": 0,',
     '  "uncertain_fields": [],',
     '  "notes": null',
@@ -25,6 +25,7 @@ function supplyClaudePrompt_() {
     '- name — название позиции полностью, как в документе, включая скобки и размеры.',
     '- sku — артикул / номенклатурный номер / код товара строки, если он напечатан в документе (например ГП000000045), символ в символ; если артикула нет — null. Не выдумывай и не путай с количеством или ценой.',
     '- unit — единица как в документе (шт, кг, л, упак и т.п.).',
+    '- pack — сколько штук в упаковке/коробке, если это ЯВНО напечатано в строке («1 X 24», «×12», «уп. 18 шт», «24шт/кор»); число штук в упаковке, а не количество упаковок. Если не указано — null. Не выдумывай.',
     '- price — цена за единицу, sum — сумма по строке. Если в документе значения нет — null. Ничего не вычисляй и не выдумывай.',
     '- total — итоговая сумма документа «Итого/К оплате», как напечатано.',
     '- Позиции перечисляй в порядке документа, не пропускай строки.',
@@ -156,7 +157,8 @@ function supplyClaudeNormalize_(raw) {
         qty: supplyNum_(it && it.qty),
         unit: it && it.unit ? String(it.unit).trim() : '',
         price: supplyNum_(it && it.price),
-        sum: supplyNum_(it && it.sum)
+        sum: supplyNum_(it && it.sum),
+        pack: (function (v) { return v !== null && v > 1 ? v : null; })(supplyNum_(it && it.pack))
       };
     })),
     total: supplyNum_(raw.total),
@@ -205,10 +207,10 @@ function supplyMergeItems_(items) {
       out.push(it);
       return;
     }
-    var key = supplyNameKey_(it.name) + '|' + String(it.unit || '').toLowerCase() + '|' + supplySkuKey_(it.sku);
+    var key = supplyNameKey_(it.name) + '|' + String(it.unit || '').toLowerCase() + '|' + supplySkuKey_(it.sku) + '|' + (it.pack || '');
     if (index[key] === undefined) {
       index[key] = out.length;
-      out.push({ sku: it.sku, name: it.name, qty: it.qty, unit: it.unit, price: it.price, sum: it.sum });
+      out.push({ sku: it.sku, name: it.name, qty: it.qty, unit: it.unit, price: it.price, sum: it.sum, pack: it.pack || null });
       return;
     }
     var m = out[index[key]];

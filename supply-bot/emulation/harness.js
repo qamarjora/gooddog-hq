@@ -36,7 +36,7 @@ const cacheStore = {};
 const clock = { offset: 0, now() { return Date.now() + this.offset; } };
 const faults = { telegramNetworkFailures: 0, telegramMatch: null, poster: 'ok', posterCalls: [] };
 
-const ingredients = [[1,'бокс для хот-дога','p'],[2,'булочка для хот-дога','p'],[3,'сосиски','p'],[4,'молоко','l'],[5,'огурцы','kg'],[6,'томаты','kg'],[7,'пакет','p']]
+const ingredients = [[1,'бокс для хот-дога','p'],[2,'булочка для хот-дога','p'],[3,'сосиски','p'],[4,'молоко','l'],[5,'огурцы','kg'],[6,'томаты','kg'],[7,'пакет','p'],[8,'кетчуп','kg'],[9,'чай зеленый пак','p'],[10,'халапеньо','kg']]
   .map(([id,n,u]) => ({ ingredient_id: String(id), ingredient_name: n, ingredient_unit: u, ingredients_type: '1', delete: '0' }));
 const suppliers = [[11,'DidarPlast'],[13,'Магнум'],[6,'Qazmeat'],[7,'Татым'],[12,'Арбуз']].map(([id,n]) => ({ supplier_id: String(id), supplier_name: n, delete: '0' }));
 

@@ -17,7 +17,10 @@ var SUPPLY_CATALOG_OPTIONS = [
   { label: '1 к 1 (в накладной те же единицы, что на складе)', mode: 'прямо' },
   { label: 'пересчёт (в накладной упаковки, на складе штуки/литры/кг)', mode: 'коэффициент' },
   { label: 'в накладной вес, на складе штуки', mode: 'ввод штук' },
-  { label: 'не оприходовать (не считаем на складе)', mode: 'пропускать' }
+  { label: 'не оприходовать (не считаем на складе)', mode: 'пропускать' },
+  { label: 'спросить количество при приёме (бот спросит, сколько кг/л)', mode: 'спросить количество' },
+  { label: 'спросить размер упаковки при приёме (сколько шт/кг/л в упаковке)', mode: 'спросить упаковку' },
+  { label: 'банки: бот спросит чистый вес одной банки', mode: 'банки' }
 ];
 
 function supplyCatalogModeFromLabel_(label) {
@@ -34,6 +37,41 @@ function supplyCatalogLabelFromMode_(mode) {
     if (SUPPLY_CATALOG_OPTIONS[i].mode === m) return SUPPLY_CATALOG_OPTIONS[i].label;
   }
   return '';
+}
+
+/**
+ * Ответы владельца из листа «Каталог Poster»: {'вид|id': {mode, coef}} — только строки с выбранным режимом.
+ * Листа нет или он не читается — пустой объект (бот работает по справочнику накладных).
+ */
+function supplyCatalogLoad_() {
+  var out = {};
+  try {
+    var sh = SpreadsheetApp.getActive().getSheetByName(SUPPLY_CATALOG_SHEET);
+    var last = sh ? sh.getLastRow() : 0;
+    if (last < 2) return out;
+    sh.getRange(2, 1, last - 1, SUPPLY_CATALOG_WIDTH).getValues().forEach(function (r) {
+      var mode = supplyCatalogModeFromLabel_(r[5]);
+      var id = Number(r[1]);
+      if (!mode || !id) return;
+      var coef = r[6] === '' ? null : supplyNum_(r[6]);
+      out[(String(r[0]) === 'товар' ? 'товар' : 'ингредиент') + '|' + id] = { mode: mode, coef: coef !== null && coef > 0 ? coef : null };
+    });
+  } catch (e) {
+    console.error('supplyCatalogLoad_: каталог недоступен: ' + e.message);
+  }
+  return out;
+}
+
+/** Запись справочника с режимом и коэффициентом из каталога Poster (если по позиции есть ответ владельца). */
+function supplyCatalogApply_(entry, answers) {
+  if (!entry || !entry.id || !answers) return entry;
+  var a = answers[(entry.ptype === 'товар' ? 'товар' : 'ингредиент') + '|' + entry.id];
+  if (!a) return entry;
+  var coef = a.coef;
+  if (coef === null && (a.mode === SUPPLY_CONST.MODE_COEF || a.mode === SUPPLY_CONST.MODE_DIRECT)) {
+    coef = a.mode === SUPPLY_CONST.MODE_DIRECT ? 1 : (entry.mode === SUPPLY_CONST.MODE_COEF ? entry.coef : null);
+  }
+  return Object.assign({}, entry, { mode: a.mode, coef: coef });
 }
 
 /**
@@ -196,5 +234,16 @@ function supplyCatalogSelfTest() {
   expect('ответ владельца сильнее подсказки из справочника (молоко: «1 к 1», а не «пересчёт»)', supplyCatalogModeFromLabel_(rows2[0][5]) === 'прямо' && rows2[0][6] === 1);
   expect('все подписи списка однозначно переводятся в режимы',
     SUPPLY_CATALOG_OPTIONS.every(function (o) { return supplyCatalogModeFromLabel_(o.label) === o.mode && supplyCatalogLabelFromMode_(o.mode) === o.label; }));
+
+  // Применение ответов каталога к записи справочника накладных.
+  var ans = { 'ингредиент|4': { mode: 'коэффициент', coef: 0.9 }, 'ингредиент|8': { mode: 'спросить количество', coef: null },
+    'ингредиент|5': { mode: 'прямо', coef: null }, 'ингредиент|6': { mode: 'коэффициент', coef: null } };
+  var ap = supplyCatalogApply_({ id: 4, ptype: 'ингредиент', mode: 'прямо', coef: 1 }, ans);
+  expect('каталог: молоко «пересчёт ×0,9» сильнее записи «прямо»', ap.mode === 'коэффициент' && ap.coef === 0.9);
+  expect('каталог: соус → «спросить количество»', supplyCatalogApply_({ id: 8, ptype: 'ингредиент', mode: 'прямо', coef: 1 }, ans).mode === 'спросить количество');
+  expect('каталог: «1 к 1» ставит коэффициент 1', supplyCatalogApply_({ id: 5, ptype: 'ингредиент', mode: 'коэффициент', coef: 3 }, ans).coef === 1);
+  expect('каталог: «пересчёт» без числа берёт коэффициент записи', supplyCatalogApply_({ id: 6, ptype: 'ингредиент', mode: 'коэффициент', coef: 2.5 }, ans).coef === 2.5);
+  expect('каталог: нет ответа по позиции — запись без изменений', supplyCatalogApply_({ id: 99, ptype: 'ингредиент', mode: 'прямо', coef: 1 }, ans).mode === 'прямо');
+  expect('каталог: товар с тем же id не путается с ингредиентом', supplyCatalogApply_({ id: 4, ptype: 'товар', mode: 'прямо', coef: 1 }, ans).mode === 'прямо');
   console.log(fails ? 'ПРОВАЛЕНО тестов: ' + fails : 'Все проверки пройдены.');
 }

@@ -160,8 +160,7 @@ function supplyFlowAdvance_(st) {
     st.pendingN = next.n;
     st.summaryNew = true; // сводка появится после вопроса — отдельным сообщением
     supplyStateSet_(st.chatId, st);
-    supplyTgSend_(st.chatId, '«' + supplyEsc_(l.name) + '»: ' + supplyFmtNum_(l.item.qty) +
-      (l.item.unit ? ' ' + supplyEsc_(l.item.unit) : '') + '. Сколько штук в поставке?');
+    supplyTgSend_(st.chatId, supplyAskText_(l));
     return;
   }
 
@@ -484,13 +483,43 @@ function supplyFlowOnText_(chatId, msg) {
   supplyTgSend_(chatId, 'Пришлите фото накладной или PDF чека.');
 }
 
+/** Вопрос сотруднику по позиции с режимом «ввод штук» / «спросить …» / «банки». */
+function supplyAskText_(l) {
+  var mode = l.entry.mode;
+  var head = '«' + supplyEsc_(l.name) + '»: ' + supplyFmtNum_(l.item.qty) + (l.item.unit ? ' ' + supplyEsc_(l.item.unit) : '') + '. ';
+  var u = supplyEsc_(l.entry.unit || '');
+  if (mode === SUPPLY_CONST.MODE_ASK_QTY) return head + 'Сколько ' + u + ' получили всего? Например: 5 или 2,5';
+  if (mode === SUPPLY_CONST.MODE_ASK_PACK) return head + 'Сколько ' + u + ' в одной упаковке? Например: 100';
+  if (mode === SUPPLY_CONST.MODE_JARS) return head + 'Чистый вес одной банки, ' + u + '? Например: 0,5\nЕсли банок не ' +
+    supplyFmtNum_(l.item.qty) + ', напишите вес и число банок: 0,5 10';
+  return head + 'Сколько штук в поставке?';
+}
+
+/** Разбор ответа сотрудника: {value, jars} или null. «Ввод штук» — целое число; «банки» — вес и, по желанию, число банок. */
+function supplyParseAnswer_(mode, text) {
+  var nums = String(text || '').match(/\d+(?:[.,]\d+)?/g);
+  if (!nums) return null;
+  var vals = nums.map(function (x) { return Number(x.replace(',', '.')); });
+  if (mode === SUPPLY_CONST.MODE_JARS) {
+    if (vals.length > 2 || !(vals[0] > 0) || (vals.length === 2 && !(vals[1] > 0))) return null;
+    return { value: vals[0], jars: vals.length === 2 ? vals[1] : null };
+  }
+  if (vals.length !== 1 || !(vals[0] > 0)) return null;
+  if (mode === SUPPLY_CONST.MODE_PIECES && !/^\d+$/.test(String(text).trim())) return null;
+  return { value: vals[0], jars: null };
+}
+
 function supplyFlowOnPiecesText_(st, text) {
-  if (!/^\d+$/.test(text) || Number(text) <= 0) {
-    supplyTgSend_(st.chatId, 'Введите число штук целым числом, например 40.');
+  var line = st.match.lines[st.pendingN - 1];
+  var mode = line && line.entry ? line.entry.mode : SUPPLY_CONST.MODE_PIECES;
+  var ans = supplyParseAnswer_(mode, text);
+  if (!ans) {
+    supplyTgSend_(st.chatId, mode === SUPPLY_CONST.MODE_PIECES ? 'Введите число штук целым числом, например 40.'
+      : (mode === SUPPLY_CONST.MODE_JARS ? 'Введите вес банки числом, например 0,5 (можно и число банок: 0,5 10).' : 'Введите число, например 2,5.'));
     return;
   }
-  if (!supplyMatchSetPieces_(st.match, st.pendingN, Number(text))) {
-    supplyTgSend_(st.chatId, 'Не получилось принять число штук. Попробуйте ещё раз или /cancel.');
+  if (!supplyMatchSetPieces_(st.match, st.pendingN, ans.value, ans.jars)) {
+    supplyTgSend_(st.chatId, 'Не получилось принять ответ. Попробуйте ещё раз или /cancel.');
     return;
   }
   supplyFlowAdvance_(st);
@@ -499,7 +528,7 @@ function supplyFlowOnPiecesText_(st, text) {
 function supplyFlowOnEditText_(st, text) {
   var doc = st.doc;
   var mQty = text.match(/^(\d+)\s+(-?[\d\s.,]+)$/);
-  var mPcs = text.match(/^(\d+)\s+шт\s+(\d+)$/i);
+  var mPcs = text.match(/^(\d+)\s+шт\s+([\d.,]+(?:\s+\d+)?)$/i);
   var mTot = text.match(/^итог\s+([\d\s.,]+)$/i);
   var mOther = text.match(/^(\d+)\s+другое$/i);
 
@@ -514,8 +543,10 @@ function supplyFlowOnEditText_(st, text) {
     st.match = supplyMatchDoc_(doc, st.match.lines);
   } else if (mPcs) {
     var n = Number(mPcs[1]);
-    if (!st.match.lines[n - 1] || !supplyMatchSetPieces_(st.match, n, Number(mPcs[2]))) {
-      supplyTgSend_(st.chatId, '⚠️ Число штук можно задать только у позиций «ввод штук». Пример: «2 шт 40».');
+    var pl = st.match.lines[n - 1];
+    var pa = pl && pl.entry ? supplyParseAnswer_(pl.entry.mode, mPcs[2]) : null;
+    if (!pl || !pa || !supplyMatchSetPieces_(st.match, n, pa.value, pa.jars)) {
+      supplyTgSend_(st.chatId, '⚠️ Число можно задать только у позиций, где бот спрашивает штуки, упаковку, количество или вес банки. Пример: «2 шт 40».');
       return;
     }
   } else if (mQty) {

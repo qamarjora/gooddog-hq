@@ -130,7 +130,7 @@ function supplyOwnerSaveItem_(st, n, ing, mode, coef, mid) {
     fields.posterName = ing.name;
     fields.unit = ing.kind === 'товар' ? 'шт' : ing.unit;
     fields.ptype = ing.kind || 'ингредиент'; // «товар» — id в колонке C это id товара (createSupply: type товара)
-    fields.coef = mode === SUPPLY_CONST.MODE_PIECES ? null : coef;
+    fields.coef = (mode === SUPPLY_CONST.MODE_DIRECT || mode === SUPPLY_CONST.MODE_COEF) ? coef : null;
   }
   supplyDirUpsert_(fields);
 
@@ -250,6 +250,16 @@ function supplyOwnerOnCallback_(cq, st, action, arg) {
       return;
     }
     var line = st.match.lines[st.pendingN - 1];
+    // Режим уже выбран владельцем в каталоге Poster — повторно не спрашиваем.
+    var cat = supplyCatalogLoad_()[(ing.kind === 'товар' ? 'товар' : 'ингредиент') + '|' + ing.id];
+    if (cat && ing.kind !== 'товар' && cat.mode !== SUPPLY_CONST.MODE_COEF) {
+      supplyOwnerSaveItem_(st, st.pendingN, ing, cat.mode, cat.mode === SUPPLY_CONST.MODE_DIRECT ? 1 : null, mid);
+      return;
+    }
+    if (cat && ing.kind !== 'товар' && cat.mode === SUPPLY_CONST.MODE_COEF && cat.coef) {
+      supplyOwnerSaveItem_(st, st.pendingN, ing, cat.mode, cat.coef, mid);
+      return;
+    }
     if (ing.kind === 'товар' || supplyUnitNorm_(line.item.unit) === supplyUnitNorm_(ing.unit)) {
       // Товар — всегда «прямо», коэффициент 1, шт; у ингредиента при совпадении единиц — тоже без лишних вопросов.
       // Единицы совпадают — режим «прямо» без лишних вопросов.

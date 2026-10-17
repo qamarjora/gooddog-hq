@@ -45,6 +45,7 @@ function supplySummaryText_(st) {
   st.match.lines.forEach(function (l) {
     if (l.status !== 'ready') return; // «пропускать» и неготовые в сводку не попадают
     lines.push(supplyEsc_(l.name) + ' — ' + supplyFmtNum_(l.qtyWh) + (l.unit ? ' ' + supplyEsc_(l.unit) : '') +
+      (l.packQty ? ' (' + supplyFmtNum_(l.item.qty) + ' × ' + supplyFmtNum_(l.packQty) + ')' : '') +
       (l.rule && supplyIsDryRun_() ? ' (по правилу)' : '')); // пометка — только в режиме проверки
   });
 
@@ -65,7 +66,10 @@ function supplyPositionsList_(st) {
   return st.match.lines.map(function (l) {
     var row = l.n + '. ' + supplyEsc_(l.docName) + ' — ' + supplyFmtNum_(l.item.qty) +
       (l.item.unit ? ' ' + supplyEsc_(l.item.unit) : '');
-    if (l.entry && l.entry.mode === SUPPLY_CONST.MODE_PIECES && l.pieces) row += ' (' + l.pieces + ' шт)';
+    if (l.entry && l.pieces && supplyModeAsks_(l.entry.mode)) {
+      row += l.entry.mode === SUPPLY_CONST.MODE_PIECES ? ' (' + l.pieces + ' шт)'
+        : ' (ответ: ' + supplyFmtNum_(l.pieces) + (l.entry.mode === SUPPLY_CONST.MODE_JARS && l.jars ? ' × ' + supplyFmtNum_(l.jars) + ' банок' : '') + ')';
+    }
     return row;
   }).join('\n');
 }

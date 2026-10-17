@@ -58,7 +58,9 @@ function supplyMatchBuildLine_(n, item, entry, pieces, cands, extra) {
     item: item,
     entry: entry ? supplyEntrySnapshot_(entry) : null,
     status: 'unknown',
-    pieces: pieces === undefined ? null : pieces,
+    pieces: pieces === undefined ? null : pieces,   // ответ сотрудника: штуки / размер упаковки / количество / вес банки
+    jars: extra.jars || null,                       // режим «банки»: число банок (по умолчанию — количество из документа)
+    packQty: null,                                  // товар: штук в упаковке по документу (qtyWh = qty × packQty)
     qtyWh: null,
     unit: entry ? entry.unit : '',
     weightPerPiece: null,
@@ -82,7 +84,10 @@ function supplyMatchBuildLine_(n, item, entry, pieces, cands, extra) {
   if (!entry.id) return line;
 
   if (entry.mode === SUPPLY_CONST.MODE_DIRECT) {
-    line.qtyWh = supplyRound3_(item.qty);
+    // Товары приходят упаковками (1 X 24): размер упаковки, напечатанный в документе, умножаем на число упаковок.
+    var mult = entry.ptype === 'товар' && item.pack > 1 ? item.pack : 1;
+    line.packQty = mult > 1 ? mult : null;
+    line.qtyWh = supplyRound3_(item.qty * mult);
     line.status = 'ready';
   } else if (entry.mode === SUPPLY_CONST.MODE_COEF) {
     if (entry.coef === null || entry.coef <= 0) {
@@ -99,6 +104,21 @@ function supplyMatchBuildLine_(n, item, entry, pieces, cands, extra) {
     }
     line.qtyWh = line.pieces;
     line.weightPerPiece = item.qty / line.pieces; // item.qty — вес по документу
+    line.status = 'ready';
+  } else if (entry.mode === SUPPLY_CONST.MODE_ASK_QTY || entry.mode === SUPPLY_CONST.MODE_ASK_PACK || entry.mode === SUPPLY_CONST.MODE_JARS) {
+    if (line.pieces === null || !(line.pieces > 0)) {
+      line.pieces = null;
+      line.status = 'need_pieces';
+      return line;
+    }
+    if (entry.mode === SUPPLY_CONST.MODE_ASK_QTY) {
+      line.qtyWh = supplyRound3_(line.pieces);
+    } else if (entry.mode === SUPPLY_CONST.MODE_ASK_PACK) {
+      line.qtyWh = supplyRound3_(item.qty * line.pieces);
+    } else {
+      line.jars = line.jars > 0 ? line.jars : item.qty;
+      line.qtyWh = supplyRound3_(line.pieces * line.jars);
+    }
     line.status = 'ready';
   } else {
     return line; // неизвестный режим -> как незнакомая позиция
@@ -117,7 +137,7 @@ function supplyMatchDoc_(doc, prevLines) {
   var rows = supplyDirLoad_(sups);
   var prevByN = {};
   (prevLines || []).forEach(function (l) {
-    prevByN[l.n] = { pieces: l.pieces, forceAsk: !!l.forceAsk };
+    prevByN[l.n] = { pieces: l.pieces, jars: l.jars, forceAsk: !!l.forceAsk };
   });
 
   // Правила по ключевым словам и справочник Poster загружаются лениво: только если позиции нет в справочнике накладных.
@@ -136,6 +156,9 @@ function supplyMatchDoc_(doc, prevLines) {
     return catalog;
   }
 
+  // Ответы владельца по каталогу Poster (режим и коэффициент по каждой позиции) сильнее записи справочника накладных.
+  var catalogAnswers = supplyCatalogLoad_();
+
   var lines = doc.items.map(function (item, i) {
     var n = i + 1;
     var m = supplyDirMatch_(rows, doc.source, item.name, item.sku, sups);
@@ -149,8 +172,8 @@ function supplyMatchDoc_(doc, prevLines) {
     // Справочника накладных нет — слово-исключение → правила по ключевым словам → вопрос владельцу.
     var res = entry || m.candidates.length ? { entry: entry, rule: null, onlyIngredients: false, exceptionWord: '' }
       : supplyResolveItemEntry_(m, item, doc.source, prev.forceAsk, getRules(), getCatalog);
-    return supplyMatchBuildLine_(n, item, res.entry, prev.pieces, m.candidates.map(supplyCandSnapshot_),
-      { rule: res.rule, onlyIngredients: res.onlyIngredients, exceptionWord: res.exceptionWord, forceAsk: prev.forceAsk });
+    return supplyMatchBuildLine_(n, item, supplyCatalogApply_(res.entry, catalogAnswers), prev.pieces, m.candidates.map(supplyCandSnapshot_),
+      { rule: res.rule, onlyIngredients: res.onlyIngredients, exceptionWord: res.exceptionWord, forceAsk: prev.forceAsk, jars: prev.jars });
   });
   var supplier = supplySupplierFind_(doc.source);
   // Совпадение не точное (другое написание, ошибка распознавания): запоминаем это написание на листе «Поставщики».
@@ -175,13 +198,17 @@ function supplyMatchNext_(match) {
   return null;
 }
 
-/** Записать число штук для позиции n. Возвращает true, если принято. */
-function supplyMatchSetPieces_(match, n, pieces) {
+/**
+ * Записать ответ сотрудника для позиции n: штуки («ввод штук»), размер упаковки, количество или вес банки
+ * (jars — число банок, необязательно). Возвращает true, если принято.
+ */
+function supplyMatchSetPieces_(match, n, pieces, jars) {
   var line = match.lines[n - 1];
-  if (!line || !line.entry || line.entry.mode !== SUPPLY_CONST.MODE_PIECES) return false;
+  if (!line || !line.entry || !supplyModeAsks_(line.entry.mode)) return false;
   if (pieces === null || !(pieces > 0)) return false;
   var rebuilt = supplyMatchBuildLine_(n, line.item, line.entry, pieces, line.cands,
-    { rule: line.rule, onlyIngredients: line.onlyIngredients, exceptionWord: line.exceptionWord, forceAsk: line.forceAsk });
+    { rule: line.rule, onlyIngredients: line.onlyIngredients, exceptionWord: line.exceptionWord, forceAsk: line.forceAsk,
+      jars: line.entry.mode === SUPPLY_CONST.MODE_JARS && jars > 0 ? jars : null });
   match.lines[n - 1] = rebuilt;
   return true;
 }

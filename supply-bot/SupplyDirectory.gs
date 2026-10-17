@@ -66,7 +66,8 @@ function supplyDirSheet_() {
   var seed = supplyDirSeedRows_();
   sh.getRange(2, 1, seed.length, SUPPLY_DIR_WIDTH).setValues(seed);
 
-  var modes = [SUPPLY_CONST.MODE_DIRECT, SUPPLY_CONST.MODE_COEF, SUPPLY_CONST.MODE_PIECES, SUPPLY_CONST.MODE_SKIP];
+  var modes = [SUPPLY_CONST.MODE_DIRECT, SUPPLY_CONST.MODE_COEF, SUPPLY_CONST.MODE_PIECES, SUPPLY_CONST.MODE_SKIP,
+    SUPPLY_CONST.MODE_ASK_PACK, SUPPLY_CONST.MODE_ASK_QTY, SUPPLY_CONST.MODE_JARS];
   sh.getRange(2, SUPPLY_DIR_COL.MODE, 500, 1).setDataValidation(
     SpreadsheetApp.newDataValidation().requireValueInList(modes, true).setAllowInvalid(true).build());
 

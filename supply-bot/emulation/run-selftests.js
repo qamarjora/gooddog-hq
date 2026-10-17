@@ -46,9 +46,11 @@ console.log('\nПроверок пройдено: ' + ok + ', провалено
 // Сценарии-проверки (диалог целиком, накладные, дубли, отчёт): отдельным процессом, у них своё состояние.
 let scenarioFailed = false;
 if (!process.env.SKIP_SCENARIOS) {
-  const r = require('child_process').spawnSync(process.execPath, [require('path').join(__dirname, 'scenarios', 'check-regression.js')], { encoding: 'utf8' });
-  const tail = String(r.stdout || '').trim().split('\n').pop();
-  console.log((r.status === 0 ? 'OK   ' : 'FAIL ') + 'сценарии (check-regression.js): ' + tail);
-  if (r.status !== 0) { scenarioFailed = true; console.log(r.stdout); }
+  ['check-regression.js', 'check-catalog.js'].forEach(f => {
+    const r = require('child_process').spawnSync(process.execPath, [require('path').join(__dirname, 'scenarios', f)], { encoding: 'utf8' });
+    const tail = String(r.stdout || '').trim().split('\n').pop();
+    console.log((r.status === 0 ? 'OK   ' : 'FAIL ') + 'сценарии (' + f + '): ' + tail);
+    if (r.status !== 0) { scenarioFailed = true; console.log(r.stdout); }
+  });
 }
 process.exit(failed || scenarioFailed ? 1 : 0);
