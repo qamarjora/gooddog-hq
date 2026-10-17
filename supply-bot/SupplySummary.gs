@@ -45,7 +45,7 @@ function supplySummaryText_(st) {
   st.match.lines.forEach(function (l) {
     if (l.status !== 'ready') return; // «пропускать» и неготовые в сводку не попадают
     lines.push(supplyEsc_(l.name) + ' — ' + supplyFmtNum_(l.qtyWh) + (l.unit ? ' ' + supplyEsc_(l.unit) : '') +
-      (l.rule ? ' (по правилу)' : ''));
+      (l.rule && supplyIsDryRun_() ? ' (по правилу)' : '')); // пометка — только в режиме проверки
   });
 
   lines.push('Итого ' + supplyFmtNum_(doc.total) + ' ₸');

@@ -3,7 +3,7 @@
  * подтверждение они не блокируют.
  *
  *  - supplyChecksDoc_(doc): арифметика документа (кол-во × цена = сумма строки; сумма строк = итог);
- *  - supplyChecksLines_(lines): цена ±10% от последней, диапазон количества (×3 / ÷3 с 3-й поставки),
+ *  - supplyChecksLines_(lines): цена ±25% от последней, диапазон количества (×3 / ÷3 с 3-й поставки),
  *    вес на штуку ±15% для режима «ввод штук»;
  *  - supplyChecksAll_(doc, lines): всё вместе.
  *
@@ -30,7 +30,10 @@ function supplyChecksDoc_(doc) {
     var n = i + 1;
     var calc = (it.qty !== null && it.price !== null) ? it.qty * it.price : null;
 
-    if (calc !== null && it.sum !== null && Math.abs(calc - it.sum) > supplyTol_(it.sum)) {
+    // Строка сходится, если кол-во × цена = сумма, либо (цена без НДС, сумма с НДС 16%) кол-во × цена × 1,16 = сумма.
+    var plainOk = calc !== null && it.sum !== null && Math.abs(calc - it.sum) <= supplyTol_(it.sum);
+    var vatOk = calc !== null && it.sum !== null && Math.abs(calc * SUPPLY_CONST.VAT_FACTOR - it.sum) <= supplyTol_(it.sum);
+    if (calc !== null && it.sum !== null && !plainOk && !vatOk) {
       warns.push('строка ' + n + ': ' + supplyFmtNum_(it.qty) + ' × ' + supplyFmtNum_(it.price) +
         ' ≠ ' + supplyFmtNum_(it.sum));
     }
@@ -134,19 +137,20 @@ function supplyChecksSelfTest() {
     return base;
   }
 
-  expect('цена +9% — без замечаний', supplyChecksLines_([line({ item: { qty: 10, price: 109, sum: 1090 } })]).length === 0);
-  expect('цена +11% — ⚠️', supplyChecksLines_([line({ item: { qty: 10, price: 111, sum: 1110 } })]).length === 1);
-  expect('цена −12% — ⚠️', supplyChecksLines_([line({ item: { qty: 10, price: 88, sum: 880 } })]).length === 1);
+  expect('цена +24% — без замечаний', supplyChecksLines_([line({ item: { qty: 10, price: 124, sum: 1240 } })]).length === 0);
+  expect('цена +11% — теперь без замечаний (допуск ±25%)', supplyChecksLines_([line({ item: { qty: 10, price: 111, sum: 1110 } })]).length === 0);
+  expect('цена +26% — ⚠️', supplyChecksLines_([line({ item: { qty: 10, price: 126, sum: 1260 } })]).length === 1);
+  expect('цена −30% — ⚠️', supplyChecksLines_([line({ item: { qty: 10, price: 70, sum: 700 } })]).length === 1);
   expect('нет последней цены — без замечаний',
     supplyChecksLines_([line({ entry: { price: null, count: 5, avg: 10, weight: null, mode: 'прямо' } })]).length === 0);
   expect('цена из суммы, если price нет',
-    supplyChecksLines_([line({ item: { qty: 10, price: null, sum: 1200 } })]).length === 1);
+    supplyChecksLines_([line({ item: { qty: 10, price: null, sum: 1300 } })]).length === 1);
 
   // Цена сравнивается за единицу склада (литр), а не за штуку документа.
   expect('цена за единицу склада: 55,6 ₸/л против 61 — в допуске, хотя 50 ₸/шт против 61 не в допуске',
     supplyChecksLines_([line({ item: { qty: 10, price: 50, sum: 500 }, unitPriceWh: 500 / 9, qtyWh: 9,
       entry: { price: 61, count: 5, avg: 9, weight: null, mode: 'коэффициент' } })]).length === 0);
-  expect('цена за единицу склада: 80 ₸/л против 61 — ⚠️',
+  expect('цена за единицу склада: 80 ₸/л против 61 (+31%) — ⚠️',
     supplyChecksLines_([line({ item: { qty: 10, price: 72, sum: 720 }, unitPriceWh: 80, qtyWh: 9,
       entry: { price: 61, count: 5, avg: 9, weight: null, mode: 'коэффициент' } })]).length === 1);
 
@@ -165,6 +169,20 @@ function supplyChecksSelfTest() {
     supplyChecksLines_([line({ entry: { price: 100, count: 0, avg: null, weight: null, mode: SUPPLY_CONST.MODE_PIECES },
       qtyWh: 40, weightPerPiece: 0.5 })]).length === 0);
   expect('позиция без записи справочника пропускается', supplyChecksLines_([line({ entry: null })]).length === 0);
+
+  // Арифметика документа: цена без НДС, сумма строки с НДС 16% («Рэд Машин»).
+  function docOf(items, total) { return { items: items, total: total }; }
+  var vatDoc = docOf([
+    { qty: 1, price: 9227.59, sum: 10704 }, { qty: 4, price: 8296.55, sum: 38496 }, { qty: 2, price: 4148.28, sum: 9624 },
+    { qty: 1, price: 4986.21, sum: 5784 }, { qty: 2, price: 3693.1, sum: 8568 }, { qty: 2, price: 3693.1, sum: 8568 },
+    { qty: 2, price: 3693.1, sum: 8568 }], 90312);
+  expect('цена без НДС, сумма с НДС 16%: без ⚠️', supplyChecksDoc_(vatDoc).length === 0);
+  expect('обычная накладная (цена × кол-во = сумма): без ⚠️',
+    supplyChecksDoc_(docOf([{ qty: 10, price: 100, sum: 1000 }], 1000)).length === 0);
+  expect('настоящая ошибка строки (не НДС): ⚠️',
+    supplyChecksDoc_(docOf([{ qty: 10, price: 100, sum: 1500 }], 1500)).length === 1);
+  expect('итог не сходится со строками: ⚠️',
+    supplyChecksDoc_(docOf([{ qty: 10, price: 100, sum: 1000 }], 2000)).length === 1);
 
   console.log(fails ? 'ПРОВАЛЕНО тестов: ' + fails : 'Все проверки пройдены.');
 }

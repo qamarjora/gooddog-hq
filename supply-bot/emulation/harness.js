@@ -91,7 +91,12 @@ const ctx = {
   }
 };
 vm.createContext(ctx);
-vm.runInContext('Date.now = (function (orig) { return function () { return orig() + (typeof __offset === "number" ? __offset : 0); }; })(Date.now);', ctx);
+// «Сейчас» в эмуляции сдвигается переменной __offset (мс) и для Date.now(), и для new Date() без аргументов.
+vm.runInContext('(function () { var RealDate = Date; var off = function () { return typeof __offset === "number" ? __offset : 0; };' +
+  ' function FakeDate() { var a = arguments; if (!(this instanceof FakeDate)) return new FakeDate().toString();' +
+  ' return a.length === 0 ? new RealDate(RealDate.now() + off()) : new (Function.prototype.bind.apply(RealDate, [null].concat([].slice.call(a))))(); }' +
+  ' FakeDate.prototype = RealDate.prototype; FakeDate.now = function () { return RealDate.now() + off(); };' +
+  ' FakeDate.UTC = RealDate.UTC; FakeDate.parse = RealDate.parse; Date = FakeDate; })();', ctx);
 const files = fs.readdirSync(dir).filter(f => /^Supply.*\.gs$/.test(f) && f !== 'SupplyDoPost.gs');
 vm.runInContext(files.map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n'), ctx);
 module.exports = { ctx, sheets, props, sent, faults, clock, cacheStore, setDoc: d => { claudeDoc = d; }, run: code => vm.runInContext(code, ctx) };

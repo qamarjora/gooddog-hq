@@ -211,14 +211,14 @@ function supplyFlowReportToOwner_(st, warns) {
 
   var reasons = [];
   if (warns.length) reasons.push('Проверка не прошла: ' + warns.join('; ') + '.');
-  var uncertain = doc.uncertain_fields || []; // у состояний из прежних версий поля может не быть
+  // Номер документа в ключе дубля и в Poster не используется, поэтому неуверенность в номере владельцу не интересна.
+  var uncertain = (doc.uncertain_fields || []).filter(function (f) { return f !== 'doc_number'; });
   if (uncertain.length) {
-    var names = { doc_number: 'номере документа', qty: 'количестве', total: 'итоге' };
+    var names = { qty: 'количестве', total: 'итоге' };
     reasons.push('Модель не уверена в: ' + uncertain.map(function (f) { return names[f] || f; }).join(', ') + '.');
   }
-  if (st.fallback) {
-    reasons.push('Основная модель не справилась (' + st.fallbackReason + '), прочитано ' + st.model + '.');
-  }
+  // Откат на Sonnet — только в лог (владельцу не шлём: на результат это не влияет).
+  if (st.fallback) console.log('Основная модель не справилась (' + st.fallbackReason + '), прочитано ' + st.model + '. ' + label);
 
   if (doc.notes) console.log('Заметка модели по ' + label + ' (чат ' + st.chatId + '): ' + doc.notes);
   if (!reasons.length) return;
@@ -407,7 +407,14 @@ function supplyFlowOnConfirm_(st) {
     }
   }
 
-  // Подтверждённая сводка без кнопок.
+  // По умолчанию вопроса «Фактически всё совпало?» нет: сразу запись (SUPPLY_ASK_ACTUAL=true возвращает вопрос).
+  // Сводка остаётся без кнопок, следом приходит «✅ Принято · сумма».
+  if (!supplyAskActualEnabled_()) {
+    supplyTgEdit_(st.chatId, st.msgId, supplySummaryText_(st));
+    st.step = 'disc';
+    supplyStateSet_(st.chatId, st);
+    return supplyFlowFinalize_(st, false, '');
+  }
   supplyTgEdit_(st.chatId, st.msgId, supplySummaryText_(st) + '\n\n✅ Подтверждено');
   var sent = supplyTgSend_(st.chatId, 'Фактически всё совпало с документом?',
     { keyboard: supplyDiscrepancyKeyboard_(st.sid) });

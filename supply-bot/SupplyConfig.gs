@@ -51,7 +51,8 @@ var SUPPLY_CONST = {
   PIECE_WEIGHT_TOL: 0.15,        // допустимое отклонение веса на штуку
   SUPPLIER_FUZZY_MIN: 0.85,      // порог схожести названия поставщика с листом «Поставщики»
   FUZZY_MIN: 0.8,               // порог схожести названий для нечёткого сопоставления
-  PRICE_TOL: 0.10,              // допустимое отклонение цены от последней
+  PRICE_TOL: 0.25,              // допустимое отклонение цены от последней (±25%: мелкие колебания не беспокоят)
+  VAT_FACTOR: 1.16,             // НДС 16%: у части накладных цена без НДС, а сумма строки с НДС
   QTY_MIN_DELIVERIES: 3,         // проверка диапазона количества включается с 3-й поставки
   QTY_FACTOR: 3,                 // «сильно выходит»: больше среднего ×3 или меньше ÷3
 
@@ -139,6 +140,23 @@ function supplyPosterProductType_() {
  */
 function supplySplitByTypeEnabled_() {
   return supplyFlagTrue_(supplyProp_('SUPPLY_POSTER_SPLIT_BY_TYPE'));
+}
+
+/**
+ * SUPPLY_ASK_ACTUAL (по умолчанию false): после «✅ Верно» спрашивать сотрудника «Фактически всё совпало с документом?».
+ * По умолчанию вопроса нет: после ✅ документ сразу записывается.
+ */
+function supplyAskActualEnabled_() {
+  return supplyFlagTrue_(supplyProp_('SUPPLY_ASK_ACTUAL'));
+}
+
+/**
+ * SUPPLY_RECENT_CHECK (по умолчанию false): вторая проверка дубля «тот же поставщик и та же сумма за 7 дней».
+ * Выключена: у хлеба и других ежедневных поставок сумма часто повторяется, и бот зря спрашивал «какой это документ».
+ * Остаются: тот же снимок (file_unique_id) и ключ «поставщик + сегодня» (+ сумма у «несколько в день» = да).
+ */
+function supplyRecentCheckEnabled_() {
+  return supplyFlagTrue_(supplyProp_('SUPPLY_RECENT_CHECK'));
 }
 
 function supplyModel_() {

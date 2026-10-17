@@ -188,7 +188,8 @@ function supplyJrnClassify_(rows, doc, key, opts) {
 function supplyJrnDupCheck_(doc) {
   var sups = supplySupLoad_();
   var sup = supplySupplierFindIn_(sups, doc.source);
-  return supplyJrnClassify_(supplyJrnLoad_(sups), doc, supplyDocKey_(doc, sups), { recentCheck: !!(sup && !sup.multi) });
+  return supplyJrnClassify_(supplyJrnLoad_(sups), doc, supplyDocKey_(doc, sups),
+    { recentCheck: !!(sup && !sup.multi) && supplyRecentCheckEnabled_() });
 }
 
 /**
@@ -254,7 +255,7 @@ function supplyJrnAppend_(entry) {
   var key = supplyDocKey_(doc, sups);
 
   var rows = supplyJrnLoad_(sups);
-  var prior = supplyJrnClassify_(rows, doc, key, { recentCheck: !!(sup && !sup.multi) }) !== null ||
+  var prior = supplyJrnClassify_(rows, doc, key, { recentCheck: !!(sup && !sup.multi) && supplyRecentCheckEnabled_() }) !== null ||
     supplyJrnClassifySnapshot_(rows, entry.fileUid) !== null; // тот же ключ, вторая проверка или тот же снимок
   var duplicate = prior && !entry.forceStats;
 

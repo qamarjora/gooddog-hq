@@ -10,7 +10,8 @@ const TESTS = [
   'supplyStage4SelfTest',    // запись: повторы Telegram, payload Poster, идемпотентность, смешанные поставки
   'supplyAccessSelfTest',    // доступ сотрудников: заявки, кнопки владельца, кэш
   'supplyProductsSelfTest',  // товары Poster и правила по ключевым словам
-  'supplyWatchdogSelfTest'   // окно работы сторожа 08:00–21:30
+  'supplyWatchdogSelfTest',  // окно работы сторожа 08:00–21:30
+  'supplyDigestSelfTest'     // вечерний отчёт владельцу
 ];
 
 let ok = 0, failed = 0, suites = 0, suitesOk = 0;
@@ -41,4 +42,12 @@ TESTS.forEach(name => {
 });
 
 console.log('\nПроверок пройдено: ' + ok + ', провалено: ' + failed + '. Наборов: ' + suitesOk + '/' + suites + '.');
-process.exit(failed ? 1 : 0);
+// Сценарии-проверки (диалог целиком, накладные, дубли, отчёт): отдельным процессом, у них своё состояние.
+let scenarioFailed = false;
+if (!process.env.SKIP_SCENARIOS) {
+  const r = require('child_process').spawnSync(process.execPath, [require('path').join(__dirname, 'scenarios', 'check-regression.js')], { encoding: 'utf8' });
+  const tail = String(r.stdout || '').trim().split('\n').pop();
+  console.log((r.status === 0 ? 'OK   ' : 'FAIL ') + 'сценарии (check-regression.js): ' + tail);
+  if (r.status !== 0) { scenarioFailed = true; console.log(r.stdout); }
+}
+process.exit(failed || scenarioFailed ? 1 : 0);

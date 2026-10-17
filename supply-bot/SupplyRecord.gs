@@ -432,8 +432,7 @@ function supplyFinalizeCore_(st, hasDisc, comment, deps) {
   var readyCount = supplyMatchReadyLines_(st.match).length;
   var empText = rec.posterError
     ? 'Передано владельцу'
-    : 'Принято: ' + readyCount + ' ' + supplyPlural_(readyCount, 'позиция', 'позиции', 'позиций') +
-      ', сумма ' + supplyFmtNum_(st.doc.total) + ' ₸';
+    : '✅ Принято · ' + supplyFmtNum_(st.doc.total) + ' ₸';
   var sent = supplySendRetry_(function () { deps.send(st, empText); });
   res.employeeDelivered = sent.ok;
 
@@ -685,8 +684,8 @@ function supplyStage4SelfTest() {
   expect('(д) dry-run: Poster не вызывается', dD.posterCalls.length === 0);
   expect('dry-run: журнал 1 строка со статусом dry-run, ссылка на файл пустая, статистика 1',
     dD.journal.length === 1 && dD.journal[0].status === 'dry-run' && dD.journal[0].link === '' && dD.stats === 1);
-  expect('dry-run: сотруднику «Принято: 2 позиции…», владельцу «Оприходовал бы»',
-    rD.status === 'dry-run' && dD.employee.length === 1 && dD.employee[0].indexOf('Принято: 2 позиции') === 0 &&
+  expect('dry-run: сотруднику «✅ Принято · сумма», владельцу «Оприходовал бы»',
+    rD.status === 'dry-run' && dD.employee.length === 1 && dD.employee[0].indexOf('✅ Принято · ') === 0 &&
     dD.owner.length === 1 && dD.owner[0].indexOf('Оприходовал бы в Poster') !== -1);
   var ownerTxt = dD.owner[0];
   console.log('   ' + ownerTxt.replace(/\n/g, ' | '));
