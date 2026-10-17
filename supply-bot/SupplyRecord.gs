@@ -263,8 +263,14 @@ function supplyApplyStats_(st) {
   supplyMatchReadyLines_(st.match).forEach(function (l) {
     if (!l.entry.row) return; // позиция по правилу ещё не записана в справочник (supplySaveRuleLines_)
     try {
-      supplyDirUpdatePrice_(l.entry.row, l.unitPriceWh); // в основную строку группы
-      supplyDirRecordStats_(l.entry.row, l.qtyWh, l.weightPerPiece);
+      // Нереальный скачок (цена в 3+ раза выше/ниже последней — скорее всего ошибка ввода) эталоном не становится:
+      // иначе следующая верная поставка тоже выглядела бы «странной». Владелец о таком уже предупреждён.
+      var e = l.entry, p = l.unitPriceWh;
+      var priceJump = p !== null && p !== undefined && e.price > 0 && (p / e.price > 3 || p / e.price < 1 / 3);
+      var qtyJump = e.count >= SUPPLY_CONST.QTY_MIN_DELIVERIES && e.avg > 0 && l.qtyWh > 0 &&
+        (l.qtyWh / e.avg > SUPPLY_CONST.QTY_FACTOR * 2 || l.qtyWh / e.avg < 1 / (SUPPLY_CONST.QTY_FACTOR * 2));
+      if (!priceJump) supplyDirUpdatePrice_(l.entry.row, l.unitPriceWh); // в основную строку группы
+      supplyDirRecordStats_(l.entry.row, qtyJump ? null : l.qtyWh, l.weightPerPiece);
     } catch (e) {
       console.error('supplyApplyStats_ справочник, строка ' + l.n + ': ' + e.message);
     }

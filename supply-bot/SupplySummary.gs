@@ -55,6 +55,7 @@ function supplySummaryText_(st) {
   if (warns.length) {
     lines.push('');
     warns.forEach(function (w) { lines.push('⚠️ ' + supplyEsc_(w)); });
+    lines.push('Проверьте строки с ⚠️: если ошибка — «Исправить», если всё верно — «Верно».');
   }
 
   var text = lines.join('\n');

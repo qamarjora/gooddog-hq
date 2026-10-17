@@ -78,8 +78,9 @@ tap('sup:dcancel:' + st.sid, 111, st.msgId); take();
 // 5. Скачок цены (+33%) — ⚠️ и сообщение владельцу; +17% — тихо
 day(3); bread(160); photo('B5'); st = cur(); m = take();
 ok('5. цена +33%: ⚠️ в сводке', st && m.edits.concat(m.toEmp).some(x => x.text.indexOf('⚠️') !== -1));
-ok('5. цена +33%: владельцу одно короткое сообщение', m.toOwner.length === 1);
-accept(st); take();
+ok('5. цена +33%: до подтверждения владельцу ничего не уходит, сотруднику — просьба проверить', m.toOwner.length === 0 && m.edits.concat(m.toEmp).some(x => x.text.indexOf('Проверьте строки с ⚠️') !== -1));
+accept(st); m = take();
+ok('5. цена +33%: после подтверждения владельцу одно сообщение «подтвердил, но есть странности»', m.toOwner.length === 1 && m.toOwner[0].text.indexOf('есть странности') !== -1 && m.toOwner[0].text.indexOf('+33%') !== -1);
 day(4); bread(140); photo('B6'); st = cur(); m = take();
 ok('5. цена ≈ +17% к последней (160 → 140 это −12%): без ⚠️ и без сообщения владельцу',
   st && !m.edits.concat(m.toEmp).some(x => x.text.indexOf('⚠️') !== -1) && m.toOwner.length === 0);

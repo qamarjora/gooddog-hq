@@ -192,11 +192,10 @@ function supplyFlowShowSummary_(st) {
     supplyTgEdit_(st.chatId, st.msgId, text, kb);
   }
 
-  var firstTime = !st.reported;
   st.reported = true;
   supplyStateSet_(st.chatId, st);
-
-  if (firstTime) supplyFlowReportToOwner_(st, supplyMatchWarnings_(st.doc, st.match));
+  // Владелец узнаёт о странностях не сейчас, а после подтверждения сотрудником (supplyFlowOnConfirm_):
+  // если сотрудник заметил ошибку и исправил — сообщения не будет.
 }
 
 /**
@@ -225,8 +224,13 @@ function supplyFlowReportToOwner_(st, warns) {
 
   var lines = reasons.slice();
   if (doc.notes) lines.push('Заметка модели: ' + doc.notes);
-  supplyOwnerNote_('ℹ️ <b>' + supplyEsc_(label) + '</b> (чат ' + supplyEsc_(st.chatId) + ')\n• ' +
-    lines.map(supplyEsc_).join('\n• '));
+  var who = '';
+  try {
+    var staff = supplyStaffReadRows_().filter(function (r) { return String(r.chatId) === String(st.chatId); })[0];
+    who = staff && staff.name ? staff.name : '';
+  } catch (e) { /* имя не критично */ }
+  supplyOwnerNote_('⚠️ <b>' + supplyEsc_(label) + '</b>' + (who ? ', принял: ' + supplyEsc_(who) : ' (чат ' + supplyEsc_(st.chatId) + ')') +
+    '\nСотрудник подтвердил поставку, но есть странности — возможно, ввели неверно:\n• ' + lines.map(supplyEsc_).join('\n• '));
 }
 
 /** Сообщение владельцу; ошибки отправки не должны ломать основной сценарий. */
@@ -404,6 +408,12 @@ function supplyFlowOnConfirm_(st) {
       supplyFlowSumStop_(st, plan);
       return;
     }
+  }
+
+  // Сотрудник проверил сводку и подтвердил: если остались странности (⚠️), владелец узнаёт об этом сразу.
+  if (!st.ownerAlerted) {
+    st.ownerAlerted = true;
+    supplyFlowReportToOwner_(st, supplyMatchWarnings_(st.doc, st.match));
   }
 
   // По умолчанию вопроса «Фактически всё совпало?» нет: сразу запись (SUPPLY_ASK_ACTUAL=true возвращает вопрос).
