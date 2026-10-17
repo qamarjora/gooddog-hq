@@ -11,7 +11,8 @@ const TESTS = [
   'supplyAccessSelfTest',    // доступ сотрудников: заявки, кнопки владельца, кэш
   'supplyProductsSelfTest',  // товары Poster и правила по ключевым словам
   'supplyWatchdogSelfTest',  // окно работы сторожа 08:00–21:30
-  'supplyDigestSelfTest'     // вечерний отчёт владельцу
+  'supplyDigestSelfTest',    // вечерний отчёт владельцу
+  'supplyCatalogSelfTest'    // каталог Poster для заполнения владельцем
 ];
 
 let ok = 0, failed = 0, suites = 0, suitesOk = 0;
