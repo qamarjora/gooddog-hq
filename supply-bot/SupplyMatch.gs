@@ -348,6 +348,15 @@ function supplyMatchSelfTest() {
   var m8 = supplyDirMatch_(rowsOtherSku, 'Qazmeatproduct', KRUG, 'ГП000000045');
   expect('другой артикул — другой товар, по названию не сопоставляется', m8.entry === null);
 
+  // Ошибка чтения длинного номера: в справочнике 132, в документе 00000001320, название то же — это одна позиция.
+  var rowsNear = [row('Татым', 'Хот-дог премиум 0,100', '132')];
+  var mN = supplyDirMatch_(rowsNear, 'Татым', 'Хот-дог премиум 0,100', '00000001320');
+  expect('артикул 132 / 1320 при точном названии — та же позиция', mN.entry !== null && mN.how === 'name');
+  expect('артикул 132 / 1320, но название другое — не сопоставляется',
+    supplyDirMatch_(rowsNear, 'Татым', 'Булочка для бургера', '00000001320').entry === null);
+  expect('артикулы 1320 / 1399 (разница в 2 знака) — другой товар',
+    supplyDirMatch_([row('Татым', 'Хот-дог премиум 0,100', '1399')], 'Татым', 'Хот-дог премиум 0,100', '1320').entry === null);
+
   var rowsNoSku = [row('Qazmeatproduct Astana', KRUG, '')];
   var m9 = supplyDirMatch_(rowsNoSku, 'Qazmeatproduct', KRUG, 'ГП000000045');
   expect('в справочнике артикула нет: сопоставление по названию (артикул запишется автоматически)',

@@ -220,6 +220,17 @@ function supplySkuEq_(a, b) {
   return ka !== '' && ka === kb;
 }
 
+/**
+ * Артикулы «почти равны»: ключи отличаются не больше чем на один символ (132 и 1320 — модель по-разному прочитала
+ * длинный номер). Короткие ключи (меньше 3 знаков) не сравниваются. Равные ключи сюда не относятся (это supplySkuEq_).
+ */
+function supplySkuNear_(a, b) {
+  var ka = supplySkuKey_(a);
+  var kb = supplySkuKey_(b);
+  if (ka.length < 3 || kb.length < 3 || ka === kb) return false;
+  return supplyLevenshtein_(ka, kb) <= 1;
+}
+
 // ---------------------------------------------------------------------------
 // Нечёткое сравнение названий
 // ---------------------------------------------------------------------------
@@ -388,7 +399,7 @@ function supplyDirFind_(source, docName, rows) {
  *  - how 'fuzzy' — единственная запись со схожестью ≥ FUZZY_MIN;
  *  - entry null и candidates (≥2) — сомнение, нужен выбор владельца;
  *  - entry null и candidates [] — позиция незнакомая.
- * Запись с другим артикулом по названию не подходит; если артикула в документе нет, работаем по названию.
+ * Запись с другим артикулом по названию не подходит (кроме опечатки в один символ при точном названии); если артикула в документе нет, работаем по названию.
  * sups — список листа «Поставщики»: записи ищутся среди строк того же supplier_id; без sups (или если supplier_id
  * не определён) источники сравниваются по тексту.
  */
@@ -403,8 +414,11 @@ function supplyDirMatch_(rows, source, name, sku, sups) {
     if (bySku.length) return { entry: bySku[0], how: 'sku', candidates: [] };
   }
 
-  // По названию — только записи, у которых нет другого артикула.
-  var eligible = inSource.filter(function (r) { return !(sku && r.sku); });
+  // По названию — записи без другого артикула, а также записи с точно таким же названием и «почти таким же» артикулом
+  // (ошибка чтения номера: 132 / 1320). Заметно другой артикул — другой товар.
+  var eligible = inSource.filter(function (r) {
+    return !(sku && r.sku) || (r.nameKey === nameKey && supplySkuNear_(r.sku, sku));
+  });
 
   var exact = eligible.filter(function (r) { return r.nameKey === nameKey; });
   if (exact.length) return { entry: exact[0], how: 'name', candidates: [] };
