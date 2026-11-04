@@ -130,6 +130,13 @@ function supplyStaffBackend_() {
     },
     cachePut: function (rows, sec) { CacheService.getScriptCache().put(SUPPLY_CONST.STAFF_CACHE_KEY, JSON.stringify(rows), sec); },
     cacheRemove: function () { CacheService.getScriptCache().remove(SUPPLY_CONST.STAFF_CACHE_KEY); },
+    // последний удачно прочитанный список (6 ч): если лист на миг недоступен, сотрудников не «забываем»
+    lastGoodGet: function () {
+      var c = CacheService.getScriptCache().get(SUPPLY_CONST.STAFF_CACHE_KEY + '_LAST');
+      if (!c) return null;
+      try { return JSON.parse(c); } catch (e) { return null; }
+    },
+    lastGoodPut: function (rows) { CacheService.getScriptCache().put(SUPPLY_CONST.STAFF_CACHE_KEY + '_LAST', JSON.stringify(rows), 21600); },
     readRows: supplyStaffReadRows_,
     upsert: supplyStaffUpsertRow_
   };
@@ -143,9 +150,17 @@ function supplyStaffMakeStore_(be) {
   var store = {
     rows: function () {
       var cached = be.cacheGet();
-      if (cached) return cached;
-      var rows = be.readRows();
+      if (cached && cached.length) return cached; // пустой список из кэша не доверяем: перечитываем лист
+      var rows;
+      try {
+        rows = be.readRows();
+      } catch (e) {
+        var last = be.lastGoodGet ? be.lastGoodGet() : null;
+        if (last) return last;
+        throw e;
+      }
       be.cachePut(rows, SUPPLY_CONST.STAFF_CACHE_SEC);
+      if (be.lastGoodPut && rows.length) { try { be.lastGoodPut(rows); } catch (e2) { /* кэш необязателен */ } }
       return rows;
     },
     statusOf: function (id) {
@@ -366,13 +381,27 @@ function supplyStaffOnCallback_(cq) {
 
 /** Допущен ли чат (владелец, ALLOWED_CHAT_IDS или активный сотрудник из листа). Сбой чтения листа доступ владельца и ALLOWED не отнимает. */
 function supplyIsAllowedChat_(chatId) {
-  var status = '';
+  var ctx = { ownerId: supplyOwnerChat_(), allowedIds: supplyAllowedChats_(), status: '' };
   try {
-    status = supplyStaffStore_().statusOf(chatId);
+    ctx.status = supplyStaffStore_().statusOf(chatId);
   } catch (e) {
     console.error('supplyIsAllowedChat_: лист «Сотрудники» недоступен: ' + supplySanitizeSecrets_(e.message));
   }
-  return supplyAccessAllowed_(chatId, { ownerId: supplyOwnerChat_(), allowedIds: supplyAllowedChats_(), status: status });
+  if (supplyAccessAllowed_(chatId, ctx)) return true;
+  if (ctx.status === SUPPLY_CONST.STAFF_DISABLED) return false;
+  // Отказ не по «отключён»: перед заявкой владельцу перечитываем лист напрямую, мимо кэша (до 3 попыток)
+  for (var i = 0; i < 3; i++) {
+    try {
+      var id = String(chatId);
+      var r = supplyStaffReadRows_().filter(function (x) { return x.chatId === id; })[0];
+      ctx.status = r ? r.status : '';
+      return supplyAccessAllowed_(chatId, ctx);
+    } catch (e2) {
+      console.error('supplyIsAllowedChat_: повторное чтение листа ' + (i + 1) + ': ' + supplySanitizeSecrets_(e2.message));
+      Utilities.sleep(400);
+    }
+  }
+  return false;
 }
 
 // ---------------------------------------------------------------------------
