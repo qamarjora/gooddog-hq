@@ -67,6 +67,8 @@ function supplyCatalogApply_(entry, answers) {
   if (!entry || !entry.id || !answers) return entry;
   var a = answers[(entry.ptype === 'товар' ? 'товар' : 'ингредиент') + '|' + entry.id];
   if (!a) return entry;
+  // «пересчёт» без коэффициента — ответ неполный: остаётся режим справочника накладных (иначе считали бы 1 к 1)
+  if (a.mode === SUPPLY_CONST.MODE_COEF && a.coef === null && !(entry.mode === SUPPLY_CONST.MODE_COEF && entry.coef)) return entry;
   var coef = a.coef;
   if (coef === null && (a.mode === SUPPLY_CONST.MODE_COEF || a.mode === SUPPLY_CONST.MODE_DIRECT)) {
     coef = a.mode === SUPPLY_CONST.MODE_DIRECT ? 1 : (entry.mode === SUPPLY_CONST.MODE_COEF ? entry.coef : null);
