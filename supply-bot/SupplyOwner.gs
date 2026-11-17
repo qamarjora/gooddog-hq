@@ -111,8 +111,9 @@ function supplyOwnerAskItem_(st, n, searchText) {
     supplyFmtNum_(line.item.qty) + (line.item.unit ? ' ' + supplyEsc_(line.item.unit) : '') +
     (searchText ? '\nПоиск: «' + supplyEsc_(searchText) + '»' : '') +
     (line.onlyIngredients ? '\nТолько ингредиенты (слово «' + supplyEsc_(line.exceptionWord) + '»)' : '') +
-    (dirCands.length ? '\n★ — похоже на позицию справочника' : '') +
-    (kb.length > 3 ? '\nЧто это в Poster?' : '\nПохожих нет — нажмите «🔍 Другое» и введите слово.');
+    (kb.length > 3 ? '\nНовый товар в накладной. Выберите, как он называется у нас на складе' +
+      (dirCands.length ? ' (★ — уже встречался раньше)' : '') + ', или нажмите «🔍 Другое».'
+      : '\nНовый товар в накладной. Похожего на складе не нашёл — нажмите «🔍 Другое» и напишите, как он называется у нас (например: помидор).');
   if (!searchText) console.log('Новая позиция, диагностика:\n' + supplyOwnerDiagText_(st, line));
   supplyOwnerSend_(st, text, kb);
 }

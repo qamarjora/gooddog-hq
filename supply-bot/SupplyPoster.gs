@@ -287,11 +287,39 @@ function supplyStem_(t) {
  * opts.onlyKind — искать только среди «ингредиент» или «товар». Возвращает до limit элементов
  * {id, name, unit, kind, uid}, лучшие первыми. Пустой массив, если совпадений нет.
  */
+/**
+ * Слова-синонимы для подсказок (первые 5 букв): в накладной «Томаты», в Poster «Помидор».
+ * Дописывайте группы по мере появления новых случаев.
+ */
+var SUPPLY_WORD_SYNONYMS = [
+  ['томат', 'помид'],
+  ['карто', 'фри'],
+  ['сосис', 'сарде'],
+  ['кинза', 'корив', 'кориа'],
+  ['огурц', 'корни'],
+  ['перец', 'халап'],
+  ['чедде', 'сыр']
+];
+
+/** Дополнительные основы слов по синонимам (без исходных). */
+function supplySynonymStems_(stems) {
+  var out = [];
+  stems.forEach(function (st) {
+    SUPPLY_WORD_SYNONYMS.forEach(function (g) {
+      var hit = g.some(function (w) { return st.indexOf(w) === 0 || w.indexOf(st) === 0; });
+      if (!hit) return;
+      g.forEach(function (w) { if (stems.indexOf(w) === -1 && out.indexOf(w) === -1) out.push(w); });
+    });
+  });
+  return out;
+}
+
 function supplySuggestIn_(catalog, text, limit, opts) {
   var onlyKind = opts && opts.onlyKind;
   var qTokens = supplyTokens_(text);
   if (!qTokens.length) return [];
   var qStems = qTokens.map(supplyStem_);
+  var synStems = supplySynonymStems_(qStems);
 
   var scored = [];
   catalog.forEach(function (ing) {
@@ -302,6 +330,9 @@ function supplySuggestIn_(catalog, text, limit, opts) {
     qTokens.forEach(function (t, i) {
       if (cTokens.indexOf(t) !== -1) score += 1.5;
       else if (cStems.indexOf(qStems[i]) !== -1) score += 1;
+    });
+    synStems.forEach(function (w) {
+      if (cStems.some(function (c) { return c.indexOf(w) === 0; })) score += 1; // синоним: «томаты» → «Помидор»
     });
     if (score > 0) {
       score -= 0.01 * cTokens.length; // при равенстве выигрывают более короткие названия
