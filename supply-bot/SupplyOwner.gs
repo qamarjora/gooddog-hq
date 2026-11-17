@@ -106,13 +106,14 @@ function supplyOwnerAskItem_(st, n, searchText) {
   ]);
   kb.push([{ text: '❌ Отменить документ', callback_data: 'sup:ocancel:' + st.sid }]);
 
-  var text = supplyDocHeader_(st.doc) + '\nНовая позиция: «' + supplyEsc_(line.docName) + '»\nВ документе: ' +
+  // Коротко: что за позиция и что сделать. Диагностика сопоставления — только в логах (supplyOwnerDiagText_).
+  var text = supplyDocHeader_(st.doc) + '\n🆕 «' + supplyEsc_(line.docName) + '» — ' +
     supplyFmtNum_(line.item.qty) + (line.item.unit ? ' ' + supplyEsc_(line.item.unit) : '') +
     (searchText ? '\nПоиск: «' + supplyEsc_(searchText) + '»' : '') +
-    (line.onlyIngredients ? '\nПравило-исключение «' + supplyEsc_(line.exceptionWord) + '»: правила для товаров не применялись, показаны только ингредиенты Poster.' : '') +
-    (dirCands.length ? '\n★ — похоже на позиции справочника. Это одна из них?' : '') +
-    (kb.length > 3 ? '\nВыберите позицию Poster:' : '\nПохожих не нашёл. Нажмите «Другое» и введите слово.');
-  if (!searchText) text += '\n\n' + supplyOwnerDiagText_(st, line);
+    (line.onlyIngredients ? '\nТолько ингредиенты (слово «' + supplyEsc_(line.exceptionWord) + '»)' : '') +
+    (dirCands.length ? '\n★ — похоже на позицию справочника' : '') +
+    (kb.length > 3 ? '\nЧто это в Poster?' : '\nПохожих нет — нажмите «🔍 Другое» и введите слово.');
+  if (!searchText) console.log('Новая позиция, диагностика:\n' + supplyOwnerDiagText_(st, line));
   supplyOwnerSend_(st, text, kb);
 }
 
